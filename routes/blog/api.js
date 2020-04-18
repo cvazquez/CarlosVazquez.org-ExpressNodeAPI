@@ -1,28 +1,16 @@
 var express = require('express'),
-    router = express.Router();
-
-console.log(router)
+    router  = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
 
-  //controller
+  async function asyncCall() {
+    const rows = await req.app.get('blogModel').getCategories();
 
-    req.app.get('blogDS').query(`
-    SELECT c.name, cu.name AS nameURL, count(distinct(ec.entryId)) AS entryCount
-    FROM categories c
-    INNER JOIN categoryurls cu ON cu.categoryId = c.id
-    INNER JOIN entrycategories ec ON ec.categoryId = c.id
-    INNER JOIN entries e ON e.id = ec.entryId
-    GROUP BY ec.categoryId
-    ORDER BY c.name`,
-      function (err, rows, fields) {
-        if (err) throw err
+    res.json({"categories": rows});
+  }
 
-        //console.log(rows);
-
-        res.json({"categories": rows[0].name});
-   })
+  asyncCall()
 
 });
 
