@@ -5,12 +5,16 @@ var express = require('express'),
 router.get('/', function(req, res, next) {
 
   (async function(blogModel, res) {
-    const latestBlogs     = await blogModel.getLatestBlogs(10),
-          latestComments  = await blogModel.getLatestComments(5);
+    const	categories      = await blogModel.getCategories(),
+			latestBlogs     = await blogModel.getLatestBlogs(5),
+          	latestComments  = await blogModel.getLatestComments(5),
+          	topCategories   = await blogModel.getTopCategories(5);
 
     res.json( {
-                latestBlogs     : latestBlogs,
-                latestComments  : latestComments
+                categories		: categories,
+                latestBlogs		: latestBlogs,
+                latestComments  : latestComments,
+                topCategories   : topCategories
               }
     );
   })(req.app.get('blogModel'), res);

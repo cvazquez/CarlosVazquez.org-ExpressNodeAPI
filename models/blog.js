@@ -72,6 +72,26 @@ module.exports = (ds) => {
                     })
             })
         }
+
+        getTopCategories(limit) {
+            return new Promise(resolve => {
+                ds.query(`  SELECT  c.name,
+                                    cu.name AS nameURL,
+                                    count(distinct(ec.entryId)) AS entryCount
+							FROM entries e
+							INNER JOIN entrycategories ec ON ec.entryId = e.id
+							INNER JOIN categoryurls cu ON cu.categoryId = ec.categoryId
+							INNER JOIN categories c ON c.id = cu.categoryId
+                            WHERE e.publishAt <= now()
+                            GROUP BY ec.categoryId
+                            ORDER BY count(distinct(ec.entryId)) desc
+                            LIMIT ?`, limit,
+                (err, rows) => {
+                    if(err) throw err
+                    resolve(rows);
+                })
+            })
+        }
     }
 
     return new blog();
