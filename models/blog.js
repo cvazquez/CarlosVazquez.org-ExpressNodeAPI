@@ -4,7 +4,7 @@ module.exports = (ds) => {
         constructor() {
         }
 
-       getCategories(res) {
+       getCategories() {
             return new Promise(resolve => {
                 ds.query(`
                     SELECT c.name, cu.name AS nameURL, count(distinct(ec.entryId)) AS entryCount
@@ -14,13 +14,65 @@ module.exports = (ds) => {
                     INNER JOIN entries e ON e.id = ec.entryId
                     GROUP BY ec.categoryId
                     ORDER BY c.name`,
-                    function (err, rows, fields) {
+                    (err, rows) => {
                         if (err) throw err
 
                         resolve(rows);
                 })
             })
         }
+
+        getLatestBlogs(limit) {
+            return new Promise(resolve => {
+                ds.query(`SELECT 	entries.title, entryurls.titleURL, Date_Format(entries.publishAt, '%b %e, %Y') AS publishDate,
+                                    entries.teaser AS contentTeaser,
+                                    count(distinct(entrydiscussions.id)) AS commentCount
+                            FROM entries
+                            LEFT OUTER JOIN entrydiscussions ON
+                                                entries.id = entrydiscussions.entryId AND entrydiscussions.entryDiscussionId IS NULL
+                                                AND ( entrydiscussions.approvedAt IS NOT NULL OR (dateDiff(now(), entrydiscussions.createdAt) <= 1) )
+                                                AND entrydiscussions.deletedAt IS NULL
+                            LEFT OUTER JOIN entryurls ON entries.id = entryurls.entryId AND entryurls.isActive = 1 AND entryurls.deletedAt IS NULL
+                            WHERE entries.deletedAt IS NULL AND entries.publishAt <= now()
+                            GROUP BY entries.id
+                            ORDER BY entries.id desc
+                            LIMIT ?`, limit,
+                    (err, rows) => {
+                        if (err) throw err
+
+                        resolve(rows);
+                })
+            })
+        }
+
+        getLatestComments(limit) {
+            return new Promise(resolve => {
+                ds.query(`SELECT 	users.firstName, CutText(entrydiscussions.content, 100, '...') AS commentTeaser,
+                                    entrydiscussions.id AS entrydiscussionid, Date_Format(entrydiscussions.createdAt, '%b %e, %Y') AS commentDate,
+                                    entryurls.titleURL,
+                                    (	SELECT count(*)
+                                        FROM entrydiscussions ed2
+                                        WHERE ed2.entryDiscussionId = entrydiscussions.id AND (ed2.approvedAt IS NOT NULL OR (dateDiff(now(), ed2.createdAt) <= 1))
+                                                    AND ed2.deletedAt IS NULL
+                                    ) AS replyCount
+                            FROM users
+                            INNER JOIN entrydiscussions ON users.id = entrydiscussions.userId
+                                                    AND (entrydiscussions.approvedAt IS NOT NULL OR (dateDiff(now(), entrydiscussions.createdAt) <= 1))
+                                                    AND entrydiscussions.deletedAt IS NULL
+                                                    AND entrydiscussions.entryId <> 168
+                            INNER JOIN entries ON entrydiscussions.entryId = entries.id AND entries.deletedAt IS NULL AND entries.publishAt <= now()
+                            INNER JOIN entryurls ON entries.id = entryurls.entryId AND entryurls.deletedAt IS NULL
+                            WHERE users.deletedAt IS NULL
+                            GROUP BY entrydiscussions.id
+                            ORDER BY entrydiscussions.id desc
+                            LIMIT ?`, limit,
+                    (err, rows) => {
+                        if(err) throw err
+                        resolve(rows);
+                    })
+            })
+        }
     }
+
     return new blog();
 }

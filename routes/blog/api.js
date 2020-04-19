@@ -4,13 +4,16 @@ var express = require('express'),
 /* GET home page. */
 router.get('/', function(req, res, next) {
 
-  async function asyncCall() {
-    const rows = await req.app.get('blogModel').getCategories();
+  (async function(blogModel, res) {
+    const latestBlogs     = await blogModel.getLatestBlogs(10),
+          latestComments  = await blogModel.getLatestComments(5);
 
-    res.json({"categories": rows});
-  }
-
-  asyncCall()
+    res.json( {
+                latestBlogs     : latestBlogs,
+                latestComments  : latestComments
+              }
+    );
+  })(req.app.get('blogModel'), res);
 
 });
 
