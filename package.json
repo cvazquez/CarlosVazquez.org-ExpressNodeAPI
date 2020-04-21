@@ -1,10 +1,10 @@
 {
-  "name": "myapp",
+  "name": "api-node",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "devstart": "nodemon ./bin/www",
+    "devstart": "nodemon ./bin/www ",
     "serverstart": "DEBUG=myapp:* npm run devstart"
   },
   "dependencies": {
@@ -18,5 +18,9 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.3"
+  },
+  "repository": {
+	  "type": "git",
+	  "url": "https://github.com/cvazquez/CarlosVazquez.org-ExpressNodeAPI"
   }
 }

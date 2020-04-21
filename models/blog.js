@@ -1,3 +1,6 @@
+var express = require('express'),
+    app		= express();
+
 module.exports = (ds) => {
 
     class blog {
@@ -15,9 +18,18 @@ module.exports = (ds) => {
                     GROUP BY ec.categoryId
                     ORDER BY c.name`,
                     (err, rows) => {
-                        if (err) throw err
+						if (err) throw err
 
-                        resolve(rows);
+					/* Testing async
+						setTimeout(function(){
+							console.log("getCategories")
+                        	resolve(rows);
+						}, 5000); */
+
+					app.get('env') === "development" && console.log("getCategories")
+
+					resolve(rows);
+
                 })
             })
         }
@@ -38,7 +50,9 @@ module.exports = (ds) => {
                             ORDER BY entries.id desc
                             LIMIT ?`, limit,
                     (err, rows) => {
-                        if (err) throw err
+						if (err) throw err
+
+						app.get('env') === "development" && console.log("getLatestBlogs")
 
                         resolve(rows);
                 })
@@ -67,7 +81,10 @@ module.exports = (ds) => {
                             ORDER BY entrydiscussions.id desc
                             LIMIT ?`, limit,
                     (err, rows) => {
-                        if(err) throw err
+						if(err) throw err
+
+						app.get('env') === "development" && console.log("getLatestComments")
+
                         resolve(rows);
                     })
             })
@@ -87,7 +104,10 @@ module.exports = (ds) => {
                             ORDER BY count(distinct(ec.entryId)) desc
                             LIMIT ?`, limit,
                 (err, rows) => {
-                    if(err) throw err
+					if(err) throw err
+
+					app.get('env') === "development" && console.log("getTopCategories")
+
                     resolve(rows);
                 })
             })
