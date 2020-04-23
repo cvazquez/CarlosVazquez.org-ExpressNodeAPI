@@ -4,9 +4,9 @@ var express = require('express'),
 /* GET home page. */
 router.get('/', function(req, res, next) {
 
-  (async function(blogModel, res) {
+  (async (blogModel, res) => {
     const	categories      = blogModel.getCategories(),
-			latestBlogs     = blogModel.getLatestBlogs(5),
+			latestBlogs     = blogModel.getLatestPosts(10),
           	latestComments  = blogModel.getLatestComments(5),
           	topCategories   = blogModel.getTopCategories(5);
 
@@ -21,18 +21,25 @@ router.get('/', function(req, res, next) {
 
 });
 
-router.get('/categories', function(req, res, next) {
+ router.get('/getAllBlogSlugs', function(req, res, next) {
+	(async (blogModel, res) => {
+		res.json(	{
+						blogSlugs	: await blogModel.getAllBlogSlugs()
+					}
+		);
+	})(req.app.get('blogModel'), res);
+});
 
-  req.app.get('blogDS').query('\
-    SELECT title\
-    FROM entries\
-    WHERE id = 1',
-    function (err, rows, fields) {
-  if (err) throw err
+router.get('/getPostByTitle/:titleURL', function(req, res, next) {
+	// /getPostByTitle/Brasil-Miami-air-flight-to-Sao-Paulo-Panama
 
-  res.json({"title": rows[0].title});
- })
-
+	(async (blogModel, res, titleURL) => {
+		console.log(titleURL);
+		res.json(	{
+						blogPost	: await blogModel.getPostByTitle(titleURL)
+					}
+		);
+	})(req.app.get('blogModel'), res, req.params.titleURL);
 });
 
 module.exports = router;

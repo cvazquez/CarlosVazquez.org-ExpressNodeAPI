@@ -34,9 +34,12 @@ module.exports = (ds) => {
             })
         }
 
-        getLatestBlogs(limit) {
+        getLatestPosts(limit) {
             return new Promise(resolve => {
-                ds.query(`SELECT 	entries.title, entryurls.titleURL, Date_Format(entries.publishAt, '%b %e, %Y') AS publishDate,
+				ds.query(`SELECT 	entries.id,
+									entries.title,
+									entryurls.titleURL,
+									Date_Format(entries.publishAt, '%b %e, %Y') AS publishDate,
                                     entries.teaser AS contentTeaser,
                                     count(distinct(entrydiscussions.id)) AS commentCount
                             FROM entries
@@ -111,7 +114,41 @@ module.exports = (ds) => {
                     resolve(rows);
                 })
             })
-        }
+		}
+
+		getAllBlogSlugs(limit) {
+            return new Promise(resolve => {
+				ds.query(`	SELECT	DISTINCT entryurls.titleURL
+							FROM entries
+							INNER JOIN entryurls ON entries.id = entryurls.entryId AND entryurls.isActive = 1 AND entryurls.deletedAt IS NULL
+							WHERE entries.deletedAt IS NULL AND entries.publishAt <= now()`,
+                    (err, rows) => {
+						if (err) throw err
+
+						app.get('env') === "development" && console.log("getAllBlogSlugs")
+
+                        resolve(rows);
+                })
+            })
+		}
+
+		getPostByTitle(titleURL) {
+			return new Promise(resolve => {
+				ds.query(`	SELECT	e.content,
+									e.title,
+									e.teaser
+							FROM entryurls eu
+							INNER JOIN entries e ON e.id = eu.entryId
+							WHERE eu.titleURL = ?`, titleURL,
+					(err, rows) => {
+						if(err) throw err
+
+						app.get('env') === "development" && console.log("getBlogPostByTitle")
+
+						resolve(rows[0]);
+					})
+			})
+		}
     }
 
     return new blog();
