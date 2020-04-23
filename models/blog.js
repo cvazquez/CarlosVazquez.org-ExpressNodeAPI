@@ -64,8 +64,10 @@ module.exports = (ds) => {
 
         getLatestComments(limit) {
             return new Promise(resolve => {
-                ds.query(`SELECT 	users.firstName, CutText(entrydiscussions.content, 100, '...') AS commentTeaser,
-                                    entrydiscussions.id AS entrydiscussionid, Date_Format(entrydiscussions.createdAt, '%b %e, %Y') AS commentDate,
+				ds.query(`SELECT 	users.firstName,
+									CutText(entrydiscussions.content, 100, '...') AS commentTeaser,
+									entrydiscussions.id AS entrydiscussionid,
+									Date_Format(entrydiscussions.createdAt, '%b %e, %Y') AS commentDate,
                                     entryurls.titleURL,
                                     (	SELECT count(*)
                                         FROM entrydiscussions ed2
@@ -95,7 +97,8 @@ module.exports = (ds) => {
 
         getTopCategories(limit) {
             return new Promise(resolve => {
-                ds.query(`  SELECT  c.name,
+				ds.query(`  SELECT  c.id,
+									c.name,
                                     cu.name AS nameURL,
                                     count(distinct(ec.entryId)) AS entryCount
 							FROM entries e

@@ -6,13 +6,13 @@ router.get('/', function(req, res, next) {
 
   (async (blogModel, res) => {
     const	categories      = blogModel.getCategories(),
-			latestBlogs     = blogModel.getLatestPosts(10),
+			latestPosts     = blogModel.getLatestPosts(10),
           	latestComments  = blogModel.getLatestComments(5),
           	topCategories   = blogModel.getTopCategories(5);
 
     res.json( {
                 categories		: await categories,
-                latestBlogs		: await latestBlogs,
+                latestPosts		: await latestPosts,
                 latestComments  : await latestComments,
                 topCategories   : await topCategories
               }
