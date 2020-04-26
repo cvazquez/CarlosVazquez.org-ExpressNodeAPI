@@ -41,11 +41,13 @@ module.exports = (ds) => {
 							c.description,
 							cu.name AS URLName
 					FROM 	categoryurls cu
-					INNER JOIN entrycategories ec ON ec.categoryId = cu.categoryId
-					INNER JOIN categories c ON c.id = ec.categoryId
+					INNER JOIN categories c ON c.id = cu.categoryId
 					WHERE	cu.name = ?
 							AND cu.isActive = 1`, categoryName,
 					(err, rows) => {
+						if (err) throw err
+
+						app.get('env') === "development" && console.log("getCategoryByName")
 
 					resolve(rows);
 				})
