@@ -5,7 +5,7 @@ const   mysql   = require('mysql'),
             user        : cred.user,
             password    : cred.password,
             database    : cred.database,
-            insecureAuth : true
+            insecureAuth : false
         });
 
 connection.connect();

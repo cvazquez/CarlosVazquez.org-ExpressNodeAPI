@@ -1,42 +1,95 @@
 var express = require('express'),
     router  = express.Router();
 
-/* GET home page. */
+// GET home page.
 router.get('/', function(req, res, next) {
 
-  (async (blogModel, res) => {
-    const	categories      = blogModel.getCategories(),
-			latestPosts     = blogModel.getLatestPosts(10),
-          	latestComments  = blogModel.getLatestComments(5),
-          	topCategories   = blogModel.getTopCategories(5);
+	// Run all queries at the same time through a promise
+	(async (blogModel, res) => {
+		const	latestPosts     = blogModel.getLatestPosts(10),
+				latestComments  = blogModel.getLatestComments(5),
+				topCategories   = blogModel.getTopCategories(5);
 
-    res.json( {
-                categories		: await categories,
-                latestPosts		: await latestPosts,
-                latestComments  : await latestComments,
-                topCategories   : await topCategories
-              }
-    );
-  })(req.app.get('blogModel'), res);
+		res.json( {
+					latestPosts		: await latestPosts,
+					latestComments  : await latestComments,
+					topCategories   : await topCategories
+		});
+	})(req.app.get('blogModel'), res);
 
 });
 
- router.get('/getAllBlogSlugs', function(req, res, next) {
+// GET All Categories
+router.get('/getCategoriesPage', function(req, res, next) {
+
+	(async (blogModel, res) => {
+		const	categories      = blogModel.getCategories(),
+				latestPosts     = blogModel.getLatestPosts(5),
+				latestComments  = blogModel.getLatestComments(5),
+				topCategories   = blogModel.getTopCategories(5);
+
+		res.json( {
+					categories		: await categories,
+					latestPosts		: await latestPosts,
+					latestComments  : await latestComments,
+					topCategories   : await topCategories
+		});
+	})(req.app.get('blogModel'), res);
+
+});
+
+// GET A Single Category
+router.get('/getCategoryPageByName/:categoryName', function(req, res, next) {
+	// /getCategoryPageByName/About-Me
+
+	(async (blogModel, res, categoryName) => {
+		const	category		= blogModel.getCategoryByName(categoryName),
+				categoryPosts	= blogModel.getCategoryPosts(categoryName),
+				latestPosts     = blogModel.getLatestPosts(5),
+				latestComments  = blogModel.getLatestComments(5),
+				topCategories   = blogModel.getTopCategories(5);
+
+		res.json( {
+					category		: await category,
+					categoryPosts	: await categoryPosts,
+					latestPosts		: await latestPosts,
+					latestComments  : await latestComments,
+					topCategories   : await topCategories
+		});
+	})(req.app.get('blogModel'), res, req.params.categoryName);
+
+});
+
+// Get all Posts
+ router.get('/getAllPostSlugs', function(req, res, next) {
 	(async (blogModel, res) => {
 		res.json(	{
-						blogSlugs	: await blogModel.getAllBlogSlugs()
+						postSlugs	: await blogModel.getPostSlugs()
 					}
 		);
 	})(req.app.get('blogModel'), res);
 });
 
-router.get('/getPostByTitle/:titleURL', function(req, res, next) {
-	// /getPostByTitle/Brasil-Miami-air-flight-to-Sao-Paulo-Panama
+router.get('/getPostPageByTitleURL/:titleURL', function(req, res, next) {
+	// /getPostPageByTitleURL/Brasil-Miami-air-flight-to-Sao-Paulo-Panama
 
 	(async (blogModel, res, titleURL) => {
-		console.log(titleURL);
+		const	blogPost		= blogModel.getPostByTitleURL(titleURL),
+				seriesPosts		= blogModel.getSeriesPostsByTitleURL(titleURL),
+				postComments	= blogModel.getPostCommentsByTitleURL(titleURL),
+				flikrImages		= blogModel.getFlikrImagesByTitleURL(titleURL),
+				topCategories	= blogModel.getTopCategories(5),
+				latestPosts     = blogModel.getLatestPosts(5),
+				latestComments  = blogModel.getLatestComments(5);
+
 		res.json(	{
-						blogPost	: await blogModel.getPostByTitle(titleURL)
+						blogPost		: await blogPost,
+						seriesPosts		: await seriesPosts,
+						postComments	: await postComments,
+						flikrImages		: await flikrImages,
+						topCategories	: await topCategories,
+						latestPosts		: await latestPosts,
+						latestComments	: await latestComments
 					}
 		);
 	})(req.app.get('blogModel'), res, req.params.titleURL);
