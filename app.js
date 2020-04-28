@@ -4,7 +4,12 @@ var createError     = require('http-errors'),
     express         = require('express'),
     path            = require('path'),
     cookieParser    = require('cookie-parser'),
-    logger          = require('morgan'),
+	logger          = require('morgan'),
+	cors 			= require('cors'),
+	corsOptions		= {
+						origin: 'http://dev.next-app.carlosvazquez.org',
+						optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+	  				},
     app             = express(),
     indexRouter     = require('./routes/index'),
     usersRouter     = require('./routes/users'),
@@ -26,6 +31,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors(corsOptions));
 
 // Define routes access from URL
 app.use('/', indexRouter);

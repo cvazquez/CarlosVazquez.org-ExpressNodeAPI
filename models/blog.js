@@ -170,7 +170,8 @@ module.exports = (ds) => {
 
 		getPostByTitleURL(titleURL) {
 			return new Promise(resolve => {
-				ds.query(`	SELECT	e.content,
+				ds.query(`	SELECT	e.id,
+									e.content,
 									e.title,
 									e.teaser
 							FROM entryurls eu
@@ -287,13 +288,49 @@ module.exports = (ds) => {
                             ORDER BY count(distinct(ec.entryId)) desc
                             LIMIT ?`, limit,
                 (err, rows) => {
-					if(err) throw err
-
-					app.get('env') === "development" && console.log("getTopCategories")
+					if(err){
+						app.get('env') === "development" && console.log(err)
+						throw err
+					}
 
                     resolve(rows);
                 })
             })
+		}
+
+		createPostComment(body) {
+			return new Promise( resolve => {
+			ds.query(`	INSERT INTO entrydiscussions
+						SET entryId				= ?,
+							entryDiscussionId	= null,
+							userId				= null,
+							firstName			= ?,
+							lastname			= ?,
+							email				= ?,
+							content				= ?,
+							emailValidationString = null,
+							wantsReplies		= ?,
+							httpRefererExternal	= null,
+							httpRefererInternal	= null,
+							httpUserAgent		= null,
+							ipAddress			= null,
+							pathInfo			= null,
+							createdBy			= null`,
+							[body.id,
+							body.firstName,
+							body.lastName,
+							body.email,
+							body.comment,
+							body.emailReply],
+			(err, rows) => {
+				if(err) {
+					app.get('env') === "development" && console.log(err)
+					throw err
+				}
+
+				resolve(rows)
+			})
+			})
 		}
     }
 

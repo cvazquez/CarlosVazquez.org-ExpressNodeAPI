@@ -95,4 +95,23 @@ router.get('/getPostPageByTitleURL/:titleURL', function(req, res, next) {
 	})(req.app.get('blogModel'), res, req.params.titleURL);
 });
 
+router.post('/postComment', (req, res) => {
+
+
+	if(req.headers["content-type"] === "application/json") {
+		(async () => {
+			let saveResponse = {
+				status	: await req.app.get('blogModel').createPostComment(req.body),
+				reqBody	: req.body
+			};
+
+			res.json(saveResponse);
+		})()
+
+	} else {
+		res.json({status	: 'Incorrent Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
+	}
+
+});
+
 module.exports = router;
