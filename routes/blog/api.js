@@ -60,16 +60,6 @@ router.get('/getCategoryPageByName/:categoryName', function(req, res, next) {
 
 });
 
-// Get all Posts
- router.get('/getAllPostSlugs', function(req, res, next) {
-	(async (blogModel, res) => {
-		res.json(	{
-						postSlugs	: await blogModel.getPostSlugs()
-					}
-		);
-	})(req.app.get('blogModel'), res);
-});
-
 router.get('/getPostPageByTitleURL/:titleURL', function(req, res, next) {
 	// /getPostPageByTitleURL/Brasil-Miami-air-flight-to-Sao-Paulo-Panama
 
@@ -93,6 +83,16 @@ router.get('/getPostPageByTitleURL/:titleURL', function(req, res, next) {
 					}
 		);
 	})(req.app.get('blogModel'), res, req.params.titleURL);
+});
+
+// Get all Posts
+router.get('/getPostSlugs', function(req, res, next) {
+	(async (blogModel, res) => {
+		res.json(	{
+						postSlugs	: await blogModel.getPostSlugs()
+					}
+		);
+	})(req.app.get('blogModel'), res);
 });
 
 router.post('/postComment', (req, res) => {

@@ -321,7 +321,7 @@ module.exports = (ds) => {
 							body.lastName,
 							body.email,
 							body.comment,
-							body.emailReply],
+							(isNaN(body.emailReply) ? 0 : 1)],
 			(err, rows) => {
 				if(err) {
 					app.get('env') === "development" && console.log(err)
