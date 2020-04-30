@@ -190,24 +190,16 @@ module.exports = (ds) => {
 		getPostCommentsByTitleURL(titleURL) {
 			return new Promise(resolve => {
 				ds.query(`	SELECT 	ed.id,
+									ed.entryDiscussionId AS replyToId,
 									ed.content,
 									Date_Format(ed.createdAt, '%b %e, %Y') AS postDate,
 									Time_Format(ed.createdAt, '%l:%i %p') AS postTime,
 									ed.firstName,
 									ed.lastName,
 									IF(ed2.id IS NOT NULL, 1, 0) AS hasReplies,
-									(	SELECT count(*)
-										FROM entrydiscussions userComments
-										WHERE	userComments.email = ed.email AND userComments.deletedAt IS NULL
-												AND (
-														userComments.approvedAt IS NOT NULL
-														OR
-														dateDiff(now(), userComments.createdAt) <= 1
-													 )
-									) AS userCommentCount
+									userCommentCount.total AS userCommentCount
 							FROM entryurls eu
 							INNER JOIN entrydiscussions ed ON	ed.entryId = eu.entryId
-																AND ed.entryDiscussionId IS NULL
 																AND ed.deletedAt IS NULL
 																AND (
 																		ed.approvedAt IS NOT NULL
@@ -218,6 +210,14 @@ module.exports = (ds) => {
 														AND users.deletedAt IS NULL
 							LEFT JOIN entrydiscussions ed2 ON	ed2.entryDiscussionId = ed.id
 																AND ed2.deletedAt IS NULL
+							LEFT JOIN (	SELECT userComments.email, COUNT(*) AS total
+										FROM entrydiscussions userComments
+										WHERE	userComments.deletedAt IS NULL
+												AND (
+														userComments.approvedAt IS NOT NULL
+													)
+										GROUP BY userComments.email
+							) AS userCommentCount ON userCommentCount.email = users.email
 							WHERE 	eu.titleURL = ?
 									AND eu.isActive = 1
 									AND eu.deletedAt IS NULL
