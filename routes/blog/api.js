@@ -28,12 +28,12 @@ router.get('/getCategoriesPage', function(req, res, next) {
 				latestComments  = blogModel.getLatestComments(5),
 				topCategories   = blogModel.getTopCategories(5);
 
-		res.json( {
-					categories		: await categories,
-					latestPosts		: await latestPosts,
-					latestComments  : await latestComments,
-					topCategories   : await topCategories
-		});
+			res.json( {
+						categories		: await categories,
+						latestPosts		: await latestPosts,
+						latestComments  : await latestComments,
+						topCategories   : await topCategories
+			});
 	})(req.app.get('blogModel'), res);
 
 });

@@ -1,24 +1,25 @@
 "use strict";
 
-var createError     = require('http-errors'),
-    express         = require('express'),
-    path            = require('path'),
-    cookieParser    = require('cookie-parser'),
-	logger          = require('morgan'),
-	cors 			= require('cors'),
-	corsOptions		= {
-						origin: 'http://dev.next-app.carlosvazquez.org',
-						optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-	  				},
-    app             = express(),
-    indexRouter     = require('./routes/index'),
-    usersRouter     = require('./routes/users'),
-    blogIndexRouter = require('./routes/blog/index'),
-    blogApiRouter   = require('./routes/blog/api'),
-    blogDS          = require('./utilities/mysql').connection,
-    blogModel       = require("./models/blog")(blogDS);
+const	createError     = require('http-errors'),
+		express         = require('express'),
+		path            = require('path'),
+		cookieParser    = require('cookie-parser'),
+		logger          = require('morgan'),
+		cors 			= require('cors'),
+		corsOptions		= {
+							origin: 'http://api.carlosvazquez.org',
+							optionsSuccessStatus: 200
+						},
+		app             = express(),
+		indexRouter     = require('./routes/index'),
+		usersRouter     = require('./routes/users'),
+		blogIndexRouter = require('./routes/blog/index'),
+		blogApiRouter   = require('./routes/blog/api'),
+		blogDS          = require('./utilities/mysql').connection,
+		blogModel       = require("./models/blog")(blogDS);
 
 
+// Set connected blog datasource to a global reusable connection
 app.set("blogDS", blogDS);
 app.set('blogModel', blogModel);
 

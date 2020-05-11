@@ -20,7 +20,13 @@ module.exports = (ds) => {
                     GROUP BY ec.categoryId
                     ORDER BY c.name`,
                     (err, rows) => {
-						if (err) throw err
+						if (err) {
+							app.get('env') === "development" && console.log(err)
+
+							resolve({
+								failed	: true
+							})
+						}
 
 					/* Testing async
 						setTimeout(function(){
@@ -45,9 +51,13 @@ module.exports = (ds) => {
 					WHERE	cu.name = ?
 							AND cu.isActive = 1`, categoryName,
 					(err, rows) => {
-						if (err) throw err
+						if (err) {
+							app.get('env') === "development" && console.log(err)
 
-						app.get('env') === "development" && console.log("getCategoryByName")
+							resolve({
+								failed	: true
+							})
+						}
 
 					resolve(rows);
 				})
@@ -69,7 +79,13 @@ module.exports = (ds) => {
 							AND e.publishAt <= now()
 					ORDER BY e.publishAt DESC`, categoryName,
 				(err, rows) => {
-					if(err) throw err
+					if (err) {
+						app.get('env') === "development" && console.log(err)
+
+						resolve({
+							failed	: true
+						})
+					}
 
 					resolve(rows);
 				})
@@ -100,7 +116,13 @@ module.exports = (ds) => {
 							WHERE eu.titleURL = ?
 							ORDER BY fsp.orderid`, titleURL,
 				(err, rows) => {
-					if(err) throw err
+					if (err) {
+						app.get('env') === "development" && console.log(err)
+
+						resolve({
+							failed	: true
+						})
+					}
 
 					resolve(rows)
 				})
@@ -131,9 +153,13 @@ module.exports = (ds) => {
                             ORDER BY entrydiscussions.id desc
                             LIMIT ?`, limit,
                     (err, rows) => {
-						if(err) throw err
+						if (err) {
+							app.get('env') === "development" && console.log(err)
 
-						app.get('env') === "development" && console.log("getLatestComments")
+							resolve({
+								failed	: true
+							})
+						}
 
                         resolve(rows);
                     })
@@ -159,9 +185,13 @@ module.exports = (ds) => {
                             ORDER BY entries.id desc
                             LIMIT ?`, limit,
                     (err, rows) => {
-						if (err) throw err
+						if (err) {
+							app.get('env') === "development" && console.log(err)
 
-						app.get('env') === "development" && console.log("getLatestBlogs")
+							resolve({
+								failed	: true
+							})
+						}
 
                         resolve(rows);
                 })
@@ -178,9 +208,13 @@ module.exports = (ds) => {
 							INNER JOIN entries e ON e.id = eu.entryId
 							WHERE eu.titleURL = ?`, titleURL,
 					(err, rows) => {
-						if(err) throw err
+						if (err) {
+							app.get('env') === "development" && console.log(err)
 
-						app.get('env') === "development" && console.log("getBlogPostByTitle")
+							resolve({
+								failed	: true
+							})
+						}
 
 						resolve(rows[0]);
 					})
@@ -224,7 +258,13 @@ module.exports = (ds) => {
 							GROUP BY ed.id
 							ORDER BY ed.id desc`, titleURL,
 					(err, rows) => {
-						if(err) throw err
+						if (err) {
+							app.get('env') === "development" && console.log(err)
+
+							resolve({
+								failed	: true
+							})
+						}
 
 						resolve(rows)
 					})
@@ -238,7 +278,13 @@ module.exports = (ds) => {
 							INNER JOIN entryurls ON entries.id = entryurls.entryId AND entryurls.isActive = 1 AND entryurls.deletedAt IS NULL
 							WHERE entries.deletedAt IS NULL AND entries.publishAt <= now()`,
                     (err, rows) => {
-						if (err) throw err
+						if (err) {
+							app.get('env') === "development" && console.log(err)
+
+							resolve({
+								failed	: true
+							})
+						}
 
                         resolve(rows);
                 })
@@ -250,7 +296,7 @@ module.exports = (ds) => {
 				ds.query(`	SELECT	e.id AS entryId,
 									s.name,
 									e.title,
-									eu.titleURL
+									eu2.titleURL
 							FROM entryurls eu
 							INNER JOIN seriesentries se ON	se.entryId = eu.entryId
 															AND se.deletedAt IS NULL
@@ -260,13 +306,21 @@ module.exports = (ds) => {
 													AND s.deletedAt IS NULL
 							INNER JOIN entries e ON	e.id = se2.entryId
 													AND e.deletedAt IS NULL
+							INNER JOIN entryurls eu2 ON eu2.entryId = e.id
+														AND eu2.deletedAt IS NULL
 							WHERE 	eu.titleURL = ?
 									AND eu.isActive = 1
 									AND eu.deletedAt IS NULL
 							ORDER BY se2.sequence
 				`, titleURL,
 				(err, rows) => {
-					if(err) throw err
+					if (err) {
+						app.get('env') === "development" && console.log(err)
+
+						resolve({
+							failed	: true
+						})
+					}
 
 					resolve(rows)
 				})
@@ -288,9 +342,12 @@ module.exports = (ds) => {
                             ORDER BY count(distinct(ec.entryId)) desc
                             LIMIT ?`, limit,
                 (err, rows) => {
-					if(err){
+					if (err) {
 						app.get('env') === "development" && console.log(err)
-						throw err
+
+						resolve({
+							failed	: true
+						})
 					}
 
                     resolve(rows);
@@ -323,9 +380,12 @@ module.exports = (ds) => {
 							body.comment,
 							(isNaN(body.emailReply) ? 0 : 1)],
 			(err, rows) => {
-				if(err) {
+				if (err) {
 					app.get('env') === "development" && console.log(err)
-					throw err
+
+					resolve({
+						failed	: true
+					})
 				}
 
 				resolve(rows)
