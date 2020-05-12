@@ -130,7 +130,7 @@ module.exports = (ds) => {
 		}
 
 		getLatestComments(limit) {
-            return new Promise(resolve => {
+            return new Promise((resolve, reject) => {
 				ds.query(`SELECT 	users.firstName,
 									CutText(entrydiscussions.content, 100, '...') AS commentTeaser,
 									entrydiscussions.id AS entrydiscussionid,
@@ -153,17 +153,18 @@ module.exports = (ds) => {
                             ORDER BY entrydiscussions.id desc
                             LIMIT ?`, limit,
                     (err, rows) => {
-						if (err) {
-							app.get('env') === "development" && console.log(err)
-
-							resolve({
-								failed	: true
-							})
-						}
+						if (err) reject(err)
 
                         resolve(rows);
                     })
-            })
+            }).catch((reason) => {
+
+				app.get('env') === "development" && console.log(reason)
+
+				return({
+					failed	: true
+				})
+			})
         }
 
         getLatestPosts(limit) {
