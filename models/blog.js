@@ -328,6 +328,26 @@ module.exports = (ds) => {
 			})
 		}
 
+
+		getSearchResults(terms) {
+			return new Promise((resolve, reject) => {
+				ds.query(`	SELECT entries.id, entries.title AS label, entryurls.titleURL AS value
+							FROM entries
+							JOIN entryurls ON entries.id = entryurls.entryId AND entryurls.isActive = 1 AND entryurls.deletedAt IS NULL
+							WHERE	MATCH (title,content) AGAINST (? IN NATURAL LANGUAGE MODE)
+									 AND entries.publishAt <= now();`, terms,
+				(err, rows) => {
+					if(err)	reject(err)
+
+					resolve(rows)
+				})
+			}).catch(reason => {
+				app.get('env') === "development" && console.log(reason)
+				return ({failed:true})
+			})
+
+		}
+
 		getTopCategories(limit) {
             return new Promise(resolve => {
 				ds.query(`  SELECT  c.id,

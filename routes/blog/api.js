@@ -95,6 +95,18 @@ router.get('/getPostSlugs', function(req, res, next) {
 	})(req.app.get('blogModel'), res);
 });
 
+router.get('/getSearchResults/:terms', (req, res) => {
+	// /getSearchResults/peru
+
+	(async (blogModel, res, terms) => {
+		res.json(	{
+						results	: await blogModel.getSearchResults(terms)
+
+		})
+	})(req.app.get('blogModel'), res, req.params.terms);
+
+})
+
 router.post('/postComment', (req, res) => {
 
 
