@@ -1,5 +1,27 @@
-var express = require('express'),
-    router  = express.Router();
+const	express 		= require('express'),
+		router  		= express.Router();
+
+let requestTracking	= {};
+
+router.all('*', function(req, res, next) {
+	// Save visitor information
+
+	requestTracking	= {
+		host		: req.headers.host,
+		referer		: req.headers.referer,
+		userAgent	: req.headers['user-agent'],
+		ip			: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+		pathInfo	: req.url
+	};
+
+	next();
+})
+
+router.get('/tracking', function(req, res, next) {
+	req.app.get('blogModel').createVisit(requestTracking, () =>{});
+
+	res.json({});
+})
 
 // GET home page.
 router.get('/', function(req, res, next) {
@@ -109,16 +131,15 @@ router.get('/getSearchResults/:terms', (req, res) => {
 
 router.post('/postComment', (req, res) => {
 
-
-	if(req.headers["content-type"] === "application/json") {
-		(async () => {
-			let saveResponse = {
-				status	: await req.app.get('blogModel').createPostComment(req.body),
-				reqBody	: req.body
+	if(req.is('json')) {
+		(async (body, requestTracking) => {
+			const saveResponse = {
+				status	: await req.app.get('blogModel').createPostComment(body, requestTracking),
+				reqBody	: body
 			};
 
 			res.json(saveResponse);
-		})()
+		})(req.body, requestTracking)
 
 	} else {
 		res.json({status	: 'Incorrent Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
