@@ -30,12 +30,14 @@ router.get('/', function(req, res, next) {
 	(async (blogModel, res) => {
 		const	latestPosts     = blogModel.getLatestPosts(10),
 				latestComments  = blogModel.getLatestComments(5),
-				topCategories   = blogModel.getTopCategories(5);
+				topCategories   = blogModel.getTopCategories(5),
+				latestSeries	= blogModel.getLatestSeries(5);
 
 		res.json( {
 					latestPosts		: await latestPosts,
 					latestComments  : await latestComments,
-					topCategories   : await topCategories
+					topCategories   : await topCategories,
+					latestSeries	: await latestSeries
 		});
 	})(req.app.get('blogModel'), res);
 
@@ -48,13 +50,15 @@ router.get('/getCategoriesPage', function(req, res, next) {
 		const	categories      = blogModel.getCategories(),
 				latestPosts     = blogModel.getLatestPosts(5),
 				latestComments  = blogModel.getLatestComments(5),
-				topCategories   = blogModel.getTopCategories(5);
+				topCategories   = blogModel.getTopCategories(5),
+				latestSeries	= blogModel.getLatestSeries(5);
 
 			res.json( {
 						categories		: await categories,
 						latestPosts		: await latestPosts,
 						latestComments  : await latestComments,
-						topCategories   : await topCategories
+						topCategories   : await topCategories,
+						latestSeries	: await latestSeries
 			});
 	})(req.app.get('blogModel'), res);
 
@@ -69,14 +73,16 @@ router.get('/getCategoryPageByName/:categoryName', function(req, res, next) {
 				categoryPosts	= blogModel.getCategoryPosts(categoryName),
 				latestPosts     = blogModel.getLatestPosts(5),
 				latestComments  = blogModel.getLatestComments(5),
-				topCategories   = blogModel.getTopCategories(5);
+				topCategories   = blogModel.getTopCategories(5),
+				latestSeries	= blogModel.getLatestSeries(5);
 
 		res.json( {
 					category		: await category,
 					categoryPosts	: await categoryPosts,
 					latestPosts		: await latestPosts,
 					latestComments  : await latestComments,
-					topCategories   : await topCategories
+					topCategories   : await topCategories,
+					latestSeries	: await latestSeries
 		});
 	})(req.app.get('blogModel'), res, req.params.categoryName);
 
@@ -92,7 +98,8 @@ router.get('/getPostPageByTitleURL/:titleURL', function(req, res, next) {
 				flikrImages		= blogModel.getFlikrImagesByTitleURL(titleURL),
 				topCategories	= blogModel.getTopCategories(5),
 				latestPosts     = blogModel.getLatestPosts(5),
-				latestComments  = blogModel.getLatestComments(5);
+				latestComments  = blogModel.getLatestComments(5),
+				latestSeries	= blogModel.getLatestSeries(5);
 
 		res.json(	{
 						blogPost		: await blogPost,
@@ -101,7 +108,8 @@ router.get('/getPostPageByTitleURL/:titleURL', function(req, res, next) {
 						flikrImages		: await flikrImages,
 						topCategories	: await topCategories,
 						latestPosts		: await latestPosts,
-						latestComments	: await latestComments
+						latestComments	: await latestComments,
+						latestSeries	: await latestSeries
 					}
 		);
 	})(req.app.get('blogModel'), res, req.params.titleURL);
@@ -127,6 +135,44 @@ router.get('/getSearchResults/:terms', (req, res) => {
 		})
 	})(req.app.get('blogModel'), res, req.params.terms);
 
+})
+
+router.get('/getSeriesPage/:seriesName', (req, res) => {
+	(async (blogModel, res, seriesName) => {
+		const	series			= blogModel.getSeries(seriesName),
+				topCategories	= blogModel.getTopCategories(5),
+				latestPosts     = blogModel.getLatestPosts(5),
+				latestComments  = blogModel.getLatestComments(5),
+				latestSeries	= blogModel.getLatestSeries(5);
+
+		res.json(	{
+						series			: await series,
+						topCategories	: await topCategories,
+						latestPosts		: await latestPosts,
+						latestComments	: await latestComments,
+						latestSeries	: await latestSeries
+					}
+		);
+	})(req.app.get('blogModel'), res, req.params.seriesName);
+})
+
+router.get('/getSeriesPages', (req, res) => {
+	(async (blogModel, res, titleURL) => {
+		const	series			= blogModel.getLatestSeries(),
+				topCategories	= blogModel.getTopCategories(5),
+				latestPosts     = blogModel.getLatestPosts(5),
+				latestComments  = blogModel.getLatestComments(5),
+				latestSeries	= blogModel.getLatestSeries(5);
+
+		res.json(	{
+						series			: await series,
+						topCategories	: await topCategories,
+						latestPosts		: await latestPosts,
+						latestComments	: await latestComments,
+						latestSeries	: await latestSeries
+					}
+		);
+	})(req.app.get('blogModel'), res, req.params.titleURL);
 })
 
 router.post('/postComment', (req, res) => {

@@ -198,12 +198,47 @@ class blog {
 		})
 	}
 
+	getLatestSeries(limit) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(`	SELECT	s.name,
+									Date_Format(s.publishAt, '%b %e, %Y') AS publishDate,
+									s.contentTeaser,
+									su.nameURL,
+									se.entryCount
+							FROM series s
+							INNER JOIN seriesurls su ON su.seriesId = s.id
+														AND su.deletedAt IS NULL
+														AND su.isActive = 1
+							INNER JOIN (
+								SELECT seriesId, COUNT(*) AS entryCount
+								FROM seriesentries se
+								WHERE se.deletedAt IS NULL
+								GROUP BY seriesId
+							) se ON se.seriesId = s.id
+							WHERE s.deletedAt IS NULL
+							ORDER BY id desc
+							${limit ? `LIMIT ?` : ""};`, limit,
+					(err, rows) => {
+						if(err) reject(err);
+
+						resolve(rows);
+					})
+		}).catch(err => {
+			console.log(err);
+
+			resolve({
+				failed: true,
+				err: err
+			})
+		})
+	}
+
 	getPostByTitleURL(titleURL) {
 		return new Promise(resolve => {
 			this.ds.query(`	SELECT	e.id,
-								e.content,
-								e.title,
-								e.teaser
+									e.content,
+									e.title,
+									e.teaser
 						FROM entryurls eu
 						INNER JOIN entries e ON e.id = eu.entryId
 						WHERE eu.titleURL = ?`, titleURL,
@@ -291,6 +326,41 @@ class blog {
 		})
 	}
 
+	getSeries(seriesName) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(`	SELECT	s.name AS seriesName,
+									e.teaser,
+									e.title AS entryTitle,
+									e.id AS entryId,
+									Date_Format(e.publishAt, '%b %e, %Y') AS publishDate,
+									eu.titleURL
+							FROM seriesurls su
+							INNER JOIN series s ON 	s.id = su.seriesId
+													AND s.deletedAt IS NULL
+							INNER JOIN seriesentries se ON 	se.seriesId = s.id
+															AND se.deletedAt IS NULL
+							INNER JOIN entries e ON	e.id = se.entryId
+													AND e.deletedAt IS NULL
+							INNER JOIN entryurls eu ON	eu.entryId = e.id
+														AND eu.isActive = 1
+														AND eu.deletedAt IS NULL
+							WHERE 	su.nameURL = ? AND su.deletedAt IS NULL;`, seriesName,
+					(err, rows) => {
+						if (err) {
+							app.get('env') === "development" && console.log(err)
+
+							reject(err);
+						}
+
+						resolve(rows);
+					})
+		}).catch(err => {
+			return({
+				failed	: true
+			})
+		})
+	}
+
 	getSeriesPostsByTitleURL(titleURL) {
 		return new Promise(resolve => {
 			this.ds.query(`	SELECT	e.id AS entryId,
@@ -330,11 +400,13 @@ class blog {
 
 	getSearchResults(terms) {
 		return new Promise((resolve, reject) => {
-			this.ds.query(`	SELECT entries.id, entries.title AS label, entryurls.titleURL AS value
-						FROM entries
-						JOIN entryurls ON entries.id = entryurls.entryId AND entryurls.isActive = 1 AND entryurls.deletedAt IS NULL
-						WHERE	MATCH (title,content) AGAINST (? IN NATURAL LANGUAGE MODE)
-									AND entries.publishAt <= now();`, terms,
+			this.ds.query(`	SELECT	entries.id,
+									entries.title AS label,
+									entryurls.titleURL AS value
+							FROM entries
+							JOIN entryurls ON entries.id = entryurls.entryId AND entryurls.isActive = 1 AND entryurls.deletedAt IS NULL
+							WHERE	MATCH (title,content) AGAINST (? IN NATURAL LANGUAGE MODE)
+										AND entries.publishAt <= now();`, terms,
 			(err, rows) => {
 				if(err)	reject(err)
 

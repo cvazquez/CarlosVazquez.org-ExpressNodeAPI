@@ -17,8 +17,6 @@ const	createError     = require('http-errors'),
 								}
 							},
 		app             = express(),
-		indexRouter     = require('./routes/index'),
-		usersRouter     = require('./routes/users'),
 		blogIndexRouter = require('./routes/blog/index'),
 		blogApiRouter   = require('./routes/blog/api'),
 		blogDS          = require('./utilities/mysql').connection,
@@ -43,18 +41,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors(corsOptions));
 
-/* app.all('/blog/api*', function(req, res, next) {
-	console.log("app.all")
-	console.log(req);
-
-	next();
-
-}); */
-
-
 // Define routes access from URL
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/blog/api', blogApiRouter);
 app.use('/blog/', blogIndexRouter);
 
