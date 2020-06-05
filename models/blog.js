@@ -11,6 +11,7 @@ class blog {
 			this.ds.query(`
 				SELECT	c.name,
 						cu.name AS nameURL,
+						c.teaser,
 						count(distinct(ec.entryId)) AS entryCount
 				FROM categories c
 				INNER JOIN categoryurls cu ON cu.categoryId = c.id
@@ -44,6 +45,7 @@ class blog {
 				SELECT	c.id,
 						c.name AS categoryName,
 						c.description,
+						c.teaser,
 						cu.name AS URLName
 				FROM 	categoryurls cu
 				INNER JOIN categories c ON c.id = cu.categoryId
@@ -423,6 +425,7 @@ class blog {
 		return new Promise(resolve => {
 			this.ds.query(`  SELECT  c.id,
 								c.name,
+								c.teaser,
 								cu.name AS nameURL,
 								count(distinct(ec.entryId)) AS entryCount
 						FROM entries e
