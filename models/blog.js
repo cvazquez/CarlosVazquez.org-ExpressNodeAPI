@@ -130,6 +130,37 @@ class blog {
 		})
 	}
 
+	getImagePosts(limit) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(`	SELECT	e.id,
+									e.title,
+									e.teaser,
+									Date_Format(e.publishAt, '%b %e, %Y') AS publishDate,
+									eu.titleURL,
+									count(DISTINCT(fsp.id)) AS imageCount
+							FROM entryflickrsets efs
+							INNER JOIN entries e ON e.id = efs.entryId
+													AND e.deletedAt IS NULL
+							INNER JOIN flickrsetphotos fsp ON 	fsp.flickrSetId = efs.flickrSetId
+																AND fsp.deletedAt IS NULL
+							INNER JOIN entryurls eu ON 	eu.entryId = e.id
+														AND eu.deletedAt IS NULL
+							WHERE efs.deletedAt IS NULL
+							GROUP BY efs.entryId
+							ORDER BY efs.createdAt DESC
+							${limit ? `LIMIT ?` : ""};`, limit,
+			(err, rows) =>  {
+				if (err) reject(err);
+
+				resolve(rows)
+			})
+		}).catch(err => {
+			app.get('env') === "development" && console.log(err)
+
+			return({failed: true});
+		})
+	}
+
 	getLatestComments(limit) {
 		return new Promise((resolve, reject) => {
 			this.ds.query(`SELECT 	users.firstName,

@@ -28,16 +28,18 @@ router.get('/', function(req, res, next) {
 
 	// Run all queries at the same time through a promise
 	(async (blogModel, res) => {
-		const	latestPosts     = blogModel.getLatestPosts(10),
-				latestComments  = blogModel.getLatestComments(5),
-				topCategories   = blogModel.getTopCategories(5),
-				latestSeries	= blogModel.getLatestSeries(5);
+		const	latestPosts     	= blogModel.getLatestPosts(10),
+				latestComments  	= blogModel.getLatestComments(5),
+				topCategories   	= blogModel.getTopCategories(5),
+				latestSeries		= blogModel.getLatestSeries(5),
+				latestImagePosts	= blogModel.getImagePosts(5);
 
 		res.json( {
-					latestPosts		: await latestPosts,
-					latestComments  : await latestComments,
-					topCategories   : await topCategories,
-					latestSeries	: await latestSeries
+					latestPosts			: await latestPosts,
+					latestComments  	: await latestComments,
+					topCategories   	: await topCategories,
+					latestSeries		: await latestSeries,
+					latestImagePosts	: await latestImagePosts
 		});
 	})(req.app.get('blogModel'), res);
 
@@ -47,18 +49,20 @@ router.get('/', function(req, res, next) {
 router.get('/getCategoriesPage', function(req, res, next) {
 
 	(async (blogModel, res) => {
-		const	categories      = blogModel.getCategories(),
-				latestPosts     = blogModel.getLatestPosts(5),
-				latestComments  = blogModel.getLatestComments(5),
-				topCategories   = blogModel.getTopCategories(5),
-				latestSeries	= blogModel.getLatestSeries(5);
+		const	categories      	= blogModel.getCategories(),
+				latestPosts     	= blogModel.getLatestPosts(5),
+				latestComments  	= blogModel.getLatestComments(5),
+				topCategories   	= blogModel.getTopCategories(5),
+				latestSeries		= blogModel.getLatestSeries(5),
+				latestImagePosts	= blogModel.getImagePosts(5);
 
 			res.json( {
-						categories		: await categories,
-						latestPosts		: await latestPosts,
-						latestComments  : await latestComments,
-						topCategories   : await topCategories,
-						latestSeries	: await latestSeries
+						categories			: await categories,
+						latestPosts			: await latestPosts,
+						latestComments  	: await latestComments,
+						topCategories   	: await topCategories,
+						latestSeries		: await latestSeries,
+						latestImagePosts	: await latestImagePosts
 			});
 	})(req.app.get('blogModel'), res);
 
@@ -69,47 +73,71 @@ router.get('/getCategoryPageByName/:categoryName', function(req, res, next) {
 	// /getCategoryPageByName/About-Me
 
 	(async (blogModel, res, categoryName) => {
-		const	category		= blogModel.getCategoryByName(categoryName),
-				categoryPosts	= blogModel.getCategoryPosts(categoryName),
-				latestPosts     = blogModel.getLatestPosts(5),
-				latestComments  = blogModel.getLatestComments(5),
-				topCategories   = blogModel.getTopCategories(5),
-				latestSeries	= blogModel.getLatestSeries(5);
+		const	category			= blogModel.getCategoryByName(categoryName),
+				categoryPosts		= blogModel.getCategoryPosts(categoryName),
+				latestPosts     	= blogModel.getLatestPosts(5),
+				latestComments  	= blogModel.getLatestComments(5),
+				topCategories   	= blogModel.getTopCategories(5),
+				latestSeries		= blogModel.getLatestSeries(5),
+				latestImagePosts	= blogModel.getImagePosts(5);
 
 		res.json( {
-					category		: await category,
-					categoryPosts	: await categoryPosts,
-					latestPosts		: await latestPosts,
-					latestComments  : await latestComments,
-					topCategories   : await topCategories,
-					latestSeries	: await latestSeries
+					category			: await category,
+					categoryPosts		: await categoryPosts,
+					latestPosts			: await latestPosts,
+					latestComments  	: await latestComments,
+					topCategories   	: await topCategories,
+					latestSeries		: await latestSeries,
+					latestImagePosts	: await latestImagePosts
 		});
 	})(req.app.get('blogModel'), res, req.params.categoryName);
 
 });
 
+router.get('/getImagePosts', (req, res) => {
+	(async function(blogModel, res) {
+		const	imagePosts			= blogModel.getImagePosts(),
+				latestPosts     	= blogModel.getLatestPosts(5),
+				latestComments  	= blogModel.getLatestComments(5),
+				topCategories   	= blogModel.getTopCategories(5),
+				latestSeries		= blogModel.getLatestSeries(5),
+				latestImagePosts	= blogModel.getImagePosts(5);
+
+		res.json({
+					imagePosts			: await imagePosts,
+					latestPosts			: await latestPosts,
+					latestComments  	: await latestComments,
+					topCategories   	: await topCategories,
+					latestSeries		: await latestSeries,
+					latestImagePosts	: await latestImagePosts
+		})
+	})(req.app.get('blogModel'), res);
+})
+
 router.get('/getPostPageByTitleURL/:titleURL', function(req, res, next) {
 	// /getPostPageByTitleURL/Brasil-Miami-air-flight-to-Sao-Paulo-Panama
 
 	(async (blogModel, res, titleURL) => {
-		const	blogPost		= blogModel.getPostByTitleURL(titleURL),
-				seriesPosts		= blogModel.getSeriesPostsByTitleURL(titleURL),
-				postComments	= blogModel.getPostCommentsByTitleURL(titleURL),
-				flikrImages		= blogModel.getFlikrImagesByTitleURL(titleURL),
-				topCategories	= blogModel.getTopCategories(5),
-				latestPosts     = blogModel.getLatestPosts(5),
-				latestComments  = blogModel.getLatestComments(5),
-				latestSeries	= blogModel.getLatestSeries(5);
+		const	blogPost			= blogModel.getPostByTitleURL(titleURL),
+				seriesPosts			= blogModel.getSeriesPostsByTitleURL(titleURL),
+				postComments		= blogModel.getPostCommentsByTitleURL(titleURL),
+				flikrImages			= blogModel.getFlikrImagesByTitleURL(titleURL),
+				topCategories		= blogModel.getTopCategories(5),
+				latestPosts     	= blogModel.getLatestPosts(5),
+				latestComments  	= blogModel.getLatestComments(5),
+				latestSeries		= blogModel.getLatestSeries(5),
+				latestImagePosts	= blogModel.getImagePosts(5);
 
 		res.json(	{
-						blogPost		: await blogPost,
-						seriesPosts		: await seriesPosts,
-						postComments	: await postComments,
-						flikrImages		: await flikrImages,
-						topCategories	: await topCategories,
-						latestPosts		: await latestPosts,
-						latestComments	: await latestComments,
-						latestSeries	: await latestSeries
+						blogPost			: await blogPost,
+						seriesPosts			: await seriesPosts,
+						postComments		: await postComments,
+						flikrImages			: await flikrImages,
+						topCategories		: await topCategories,
+						latestPosts			: await latestPosts,
+						latestComments		: await latestComments,
+						latestSeries		: await latestSeries,
+						latestImagePosts	: await latestImagePosts
 					}
 		);
 	})(req.app.get('blogModel'), res, req.params.titleURL);
@@ -139,18 +167,20 @@ router.get('/getSearchResults/:terms', (req, res) => {
 
 router.get('/getSeriesPage/:seriesName', (req, res) => {
 	(async (blogModel, res, seriesName) => {
-		const	series			= blogModel.getSeries(seriesName),
-				topCategories	= blogModel.getTopCategories(5),
-				latestPosts     = blogModel.getLatestPosts(5),
-				latestComments  = blogModel.getLatestComments(5),
-				latestSeries	= blogModel.getLatestSeries(5);
+		const	series				= blogModel.getSeries(seriesName),
+				topCategories		= blogModel.getTopCategories(5),
+				latestPosts     	= blogModel.getLatestPosts(5),
+				latestComments  	= blogModel.getLatestComments(5),
+				latestSeries		= blogModel.getLatestSeries(5),
+				latestImagePosts	= blogModel.getImagePosts(5);
 
 		res.json(	{
-						series			: await series,
-						topCategories	: await topCategories,
-						latestPosts		: await latestPosts,
-						latestComments	: await latestComments,
-						latestSeries	: await latestSeries
+						series				: await series,
+						topCategories		: await topCategories,
+						latestPosts			: await latestPosts,
+						latestComments		: await latestComments,
+						latestSeries		: await latestSeries,
+						latestImagePosts	: await latestImagePosts
 					}
 		);
 	})(req.app.get('blogModel'), res, req.params.seriesName);
@@ -158,18 +188,20 @@ router.get('/getSeriesPage/:seriesName', (req, res) => {
 
 router.get('/getSeriesPages', (req, res) => {
 	(async (blogModel, res, titleURL) => {
-		const	series			= blogModel.getLatestSeries(),
-				topCategories	= blogModel.getTopCategories(5),
-				latestPosts     = blogModel.getLatestPosts(5),
-				latestComments  = blogModel.getLatestComments(5),
-				latestSeries	= blogModel.getLatestSeries(5);
+		const	series				= blogModel.getLatestSeries(),
+				topCategories		= blogModel.getTopCategories(5),
+				latestPosts     	= blogModel.getLatestPosts(5),
+				latestComments  	= blogModel.getLatestComments(5),
+				latestSeries		= blogModel.getLatestSeries(5),
+				latestImagePosts	= blogModel.getImagePosts(5);
 
 		res.json(	{
-						series			: await series,
-						topCategories	: await topCategories,
-						latestPosts		: await latestPosts,
-						latestComments	: await latestComments,
-						latestSeries	: await latestSeries
+						series				: await series,
+						topCategories		: await topCategories,
+						latestPosts			: await latestPosts,
+						latestComments		: await latestComments,
+						latestSeries		: await latestSeries,
+						latestImagePosts	: await latestImagePosts
 					}
 		);
 	})(req.app.get('blogModel'), res, req.params.titleURL);
