@@ -96,15 +96,21 @@ class blog {
 	getFlikrImagesByTitleURL(titleURL) {
 		return new Promise(resolve => {
 			this.ds.query(`	SELECT	fsp.id,
-								fsp.title,
-								fsp.description,
-								fsp.squareurl,
-								fsp.squarewidth,
-								fsp.squareheight,
-								fsp.mediumurl,
-								fsp.mediumwidth,
-								fsp.mediumheight,
-								fspu.name AS mediumUrlReWritten
+									fsp.title,
+									fsp.description,
+									fsp.squareURL,
+									fsp.squareWidth,
+									fsp.squareHeight,
+									fsp.smallURL,
+									fsp.smallWidth,
+									fsp.smallHeight,
+									fsp.mediumURL,
+									fsp.mediumWidth,
+									fsp.mediumHeight,
+									fsp.largeURL,
+									fsp.largeWidth,
+									fsp.largeHeight,
+									fspu.name AS mediumUrlReWritten
 						FROM entryurls eu
 						INNER JOIN entryflickrsets efs ON	efs.entryId = eu.entryId
 															AND efs.deletedAt IS NULL
