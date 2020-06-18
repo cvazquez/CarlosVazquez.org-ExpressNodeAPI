@@ -17,16 +17,18 @@ const	createError     = require('http-errors'),
 								}
 							},
 		app             = express(),
-		blogIndexRouter = require('./routes/blog/index'),
-		blogApiRouter   = require('./routes/blog/api'),
+		blogApiRouter   = require('./routes/blog/api/index'),
 		blogDS          = require('./utilities/mysql').connection,
-		blogObject      = require("./models/blog").blog,
-		blogModel		= new blogObject(blogDS);
-
+		blogObject      = require("./models/blog/index").blog,
+		blogModel		= new blogObject(blogDS),
+		blogAdminRouter	= require('./routes/blog/api/admin'),
+		blogAdminObject	= require("./models/blog/admin").blogAdmin,
+		blogAdminModel	= new blogAdminObject(blogDS);
 
 // Set connected blog datasource to a global reusable connection
 app.set("blogDS", blogDS);
 app.set('blogModel', blogModel);
+app.set('blogAdminModel', blogAdminModel);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -42,8 +44,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors(corsOptions));
 
 // Define routes access from URL
+app.use('/blog/api/admin', blogAdminRouter);
 app.use('/blog/api', blogApiRouter);
-app.use('/blog/', blogIndexRouter);
 
 
 
