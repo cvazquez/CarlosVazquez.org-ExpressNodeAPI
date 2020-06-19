@@ -6,6 +6,34 @@ class blogAdmin {
 		this.ds = ds;
 	}
 
+	getCategories() {
+		console.log("getcategories")
+		return new Promise((resolve, reject) => {
+			this.ds.query(`
+				SELECT id, name
+				FROM categories
+				WHERE deletedAt IS NULL
+				ORDER BY name;`,
+			(err, rows) => {
+				if (err) {
+					if(app.get('env') === "developement") {
+						console.log("********* getCategories(body) error ***********");
+						console.log(err);
+					}
+
+					resolve({
+						failed	: true
+					})
+				}
+
+				resolve(rows);
+			})
+		}).catch(err => {
+			console.log("********* Promise Error: getCategories() *********");
+			console.log(err);
+		})
+	}
+
 	getPostById(entryId) {
 		return new Promise(resolve => {
 			this.ds.query(`
@@ -22,7 +50,10 @@ class blogAdmin {
 				WHERE e.id = ?;`, entryId,
 				(err, rows) => {
 					if (err) {
-						app.get('env') === "development" && console.log(err)
+						if(app.get('env') === "developement") {
+							console.log("********* getPostById(body) error ***********");
+							console.log(err);
+						}
 
 						resolve({
 							failed	: true
@@ -31,6 +62,9 @@ class blogAdmin {
 
 				resolve(rows);
 			})
+		}).catch(err => {
+			console.log("********* Promise Error: getPostById() *********");
+			console.log(err);
 		})
 	}
 
@@ -46,7 +80,10 @@ class blogAdmin {
 				ORDER BY e.createdAt DESC;`,
 				(err, rows) => {
 					if (err) {
-						app.get('env') === "development" && console.log(err)
+						if(app.get('env') === "developement") {
+							console.log("********* getPostsToEdit(body) error ***********");
+							console.log(err);
+						}
 
 						resolve({
 							failed	: true
@@ -55,6 +92,9 @@ class blogAdmin {
 
 				resolve(rows);
 			})
+		}).catch(err => {
+			console.log("********* Promise Error: getPostsToEdit() *********");
+			console.log(err);
 		})
 	}
 

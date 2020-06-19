@@ -3,8 +3,6 @@ const	express 		= require('express'),
 
 // Get list of blogs
 router.get('/getEditList', function(req, res) {
-
-	// Run all queries at the same time through a promise
 	(async (blogAdminModel, res) => {
 		const	posts	= blogAdminModel.getPostsToEdit();
 
@@ -19,10 +17,12 @@ router.get('/getEditList', function(req, res) {
 router.get('/getPost/:id', function(req, res) {
 
 	(async (blogAdminModel, res, id) => {
-		const	post	= blogAdminModel.getPostById(id);
+		const	post		= blogAdminModel.getPostById(id),
+				categories	= blogAdminModel.getCategories();
 
 		res.json( {
-					post	: await post
+					post		: await post,
+					categories	: await categories
 		});
 	})(req.app.get('blogAdminModel'), res, req.params.id);
 
