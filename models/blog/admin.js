@@ -7,7 +7,6 @@ class blogAdmin {
 	}
 
 	getCategories() {
-		console.log("getcategories")
 		return new Promise((resolve, reject) => {
 			this.ds.query(`
 				SELECT id, name
@@ -16,7 +15,7 @@ class blogAdmin {
 				ORDER BY name;`,
 			(err, rows) => {
 				if (err) {
-					if(app.get('env') === "developement") {
+					if(app.get('env') === "development") {
 						console.log("********* getCategories(body) error ***********");
 						console.log(err);
 					}
@@ -50,7 +49,7 @@ class blogAdmin {
 				WHERE e.id = ?;`, entryId,
 				(err, rows) => {
 					if (err) {
-						if(app.get('env') === "developement") {
+						if(app.get('env') === "development") {
 							console.log("********* getPostById(body) error ***********");
 							console.log(err);
 						}
@@ -68,6 +67,34 @@ class blogAdmin {
 		})
 	}
 
+	getPostCategories(id) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(`	SELECT c.id, c.name
+							FROM entrycategories ec
+							INNER JOIN categories c ON	c.id = ec.categoryId
+														AND c.deletedAt IS NULL
+							WHERE	ec.entryId = ?
+									AND ec.deletedAt IS NULL`, id,
+					(err, rows) => {
+						if (err) {
+							if(app.get('env') === "development") {
+								console.log("********* getPostCategories(body) error ***********");
+								console.log(err);
+							}
+
+							resolve({
+								failed	: true
+							})
+						}
+
+						resolve(rows);
+				})
+		}).catch(err => {
+			console.log("********* Promise Error: getPostCategories() *********");
+			console.log(err);
+		})
+	}
+
 	getPostsToEdit() {
 		return new Promise(resolve => {
 			this.ds.query(`
@@ -80,7 +107,7 @@ class blogAdmin {
 				ORDER BY e.createdAt DESC;`,
 				(err, rows) => {
 					if (err) {
-						if(app.get('env') === "developement") {
+						if(app.get('env') === "development") {
 							console.log("********* getPostsToEdit(body) error ***********");
 							console.log(err);
 						}
@@ -105,7 +132,7 @@ class blogAdmin {
 									content	= ?;`, [body.entryId, body.content],
 								(err, rows) => {
 									if(err) {
-										if(app.get('env') === "developement") {
+										if(app.get('env') === "development") {
 											console.log("********* saveDraft(body) error ***********");
 											console.log(err);
 										}
@@ -137,7 +164,7 @@ class blogAdmin {
 							[body.title, body.teaser, body.content, body.metaDescription, body.metaKeyWords, body.publishAt, body.entryId],
 			(err, rows) => {
 				if(err) {
-					if(app.get('env') === "developement") {
+					if(app.get('env') === "development") {
 						console.log("********* updatePost(body) error ***********");
 						console.log(err);
 					}
@@ -153,6 +180,35 @@ class blogAdmin {
 			console.log("********* Promise Error *********");
 			console.log(err);
 		})
+	}
+
+	updatePostCategories(entryId, categoryNames) {
+		console.log("updatePostCategories")
+		console.log(entryId)
+		console.log(categoryNames)
+
+		/* return new Promise((resolve, reject) => {
+			this.ds.query(`	REPLACE INTO entrycategories (entryId, categoryId)
+							VALUES (?, ?);`,
+							[],
+			(err, rows) => {
+				if(err) {
+					if(app.get('env') === "development") {
+						console.log("********* updatePostCategories(body) error ***********");
+						console.log(err);
+					}
+
+					resolve({
+						failed: true
+					});
+				}
+
+				resolve(rows);
+			}
+		)}).catch(err => {
+			console.log("********* updatePostCategories(body) Promise Error *********");
+			console.log(err);
+		}) */
 	}
 
 }

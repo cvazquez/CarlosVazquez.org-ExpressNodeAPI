@@ -17,12 +17,14 @@ router.get('/getEditList', function(req, res) {
 router.get('/getPost/:id', function(req, res) {
 
 	(async (blogAdminModel, res, id) => {
-		const	post		= blogAdminModel.getPostById(id),
-				categories	= blogAdminModel.getCategories();
+		const	post			= blogAdminModel.getPostById(id),
+				postCategories	= blogAdminModel.getPostCategories(id),
+				categories		= blogAdminModel.getCategories();
 
 		res.json( {
-					post		: await post,
-					categories	: await categories
+					post			: await post,
+					postCategories	: await postCategories,
+					categories		: await categories
 		});
 	})(req.app.get('blogAdminModel'), res, req.params.id);
 
@@ -49,12 +51,14 @@ router.post('/updatePost', (req, res) => {
 
 	if(req.is('json')) {
 		(async (body) => {
-			const saveResponse = {
-				status	: await req.app.get('blogAdminModel').updatePost(body),
-				reqBody	: body
-			};
+			const savePost = {
+						status	: await req.app.get('blogAdminModel').updatePost(body),
+						reqBody	: body
+					}
 
-			res.json(saveResponse);
+			savePostCategories = await req.app.get('blogAdminModel').updatePostCategories(body.entryId, body.categoryNamesSelected);
+
+			res.json(savePost);
 		})(req.body)
 
 	} else {
