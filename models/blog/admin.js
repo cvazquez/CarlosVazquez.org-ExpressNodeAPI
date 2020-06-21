@@ -182,15 +182,15 @@ class blogAdmin {
 		})
 	}
 
-	updatePostCategories(entryId, categoryNames) {
-		console.log("updatePostCategories")
-		console.log(entryId)
-		console.log(categoryNames)
-
-		/* return new Promise((resolve, reject) => {
-			this.ds.query(`	REPLACE INTO entrycategories (entryId, categoryId)
-							VALUES (?, ?);`,
-							[],
+	deletePostCategories(entryId, categoryNames) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(`
+							DELETE ec
+							FROM categories c
+							INNER JOIN entrycategories ec ON	ec.entryId = ?
+																AND ec.categoryId = c.id
+							WHERE 	c.name NOT IN (?);`,
+							[entryId, categoryNames],
 			(err, rows) => {
 				if(err) {
 					if(app.get('env') === "development") {
@@ -208,7 +208,39 @@ class blogAdmin {
 		)}).catch(err => {
 			console.log("********* updatePostCategories(body) Promise Error *********");
 			console.log(err);
-		}) */
+		})
+	}
+
+	savePostCategories(entryId, categoryNames) {
+		const categoryInsertValues = [];
+
+		categoryNames.forEach(categoryName => {
+			categoryInsertValues.push([entryId, categoryName]);
+		});
+
+		return new Promise((resolve, reject) => {
+			this.ds.query(`	INSERT IGNORE INTO entrycategories (entryId, categoryId)
+							SELECT ?, c.id
+							FROM categories c
+							WHERE c.name IN (?);`, [entryId, categoryNames],
+			(err, rows) => {
+				if(err) {
+					if(app.get('env') === "development") {
+						console.log("********* savePostCategories(body) error ***********");
+						console.log(err);
+					}
+
+					resolve({
+						failed: true
+					});
+				}
+
+				resolve(rows);
+			}
+		)}).catch(err => {
+			console.log("********* savePostCategories(body) Promise Error *********");
+			console.log(err);
+		})
 	}
 
 }

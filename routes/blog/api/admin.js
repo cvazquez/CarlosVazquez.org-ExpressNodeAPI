@@ -51,14 +51,15 @@ router.post('/updatePost', (req, res) => {
 
 	if(req.is('json')) {
 		(async (body) => {
-			const savePost = {
-						status	: await req.app.get('blogAdminModel').updatePost(body),
-						reqBody	: body
-					}
+			const 	savePost 				= req.app.get('blogAdminModel').updatePost(body),
+					deletePostCategories	= req.app.get('blogAdminModel').deletePostCategories(body.entryId, body.categoryNamesSelected),
+					savePostCategories		= req.app.get('blogAdminModel').savePostCategories(body.entryId, body.categoryNamesSelected);
 
-			savePostCategories = await req.app.get('blogAdminModel').updatePostCategories(body.entryId, body.categoryNamesSelected);
-
-			res.json(savePost);
+			res.json({
+						savePost				: await savePost,
+						deletePostCategories	: await deletePostCategories,
+						savePostCategories		: await savePostCategories
+			});
 		})(req.body)
 
 	} else {
