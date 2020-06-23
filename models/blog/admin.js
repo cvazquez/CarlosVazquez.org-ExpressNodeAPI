@@ -125,6 +125,36 @@ class blogAdmin {
 		})
 	}
 
+	addPost(body) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(	`	INSERT INTO entries
+								SET title			= ?,
+									teaser			= ?,
+									content			= ?,
+									metaDescription	= ?,
+									metaKeyWords	= ?,
+									publishAt		= ?`,
+								[body.title, body.teaser, body.content, body.metaDescription, body.metaKeyWords, body.publishAt],
+				(err, rows) => {
+					if(err) {
+						if(app.get('env') === "development") {
+							console.log("********* addPost(body) error ***********");
+							console.log(err);
+						}
+
+						resolve({
+							failed: true
+						});
+					}
+
+					resolve(rows);
+				})
+		}).catch(err => {
+			console.log("********* Promise Error: addPost(body) *********");
+			console.log(err);
+		})
+	}
+
 	saveDraft(body) {
 		return new Promise((resolve, reject) => {
 			this.ds.query(	`	INSERT INTO entrydrafts

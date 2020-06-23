@@ -1,6 +1,16 @@
 const	express 		= require('express'),
 		router  		= express.Router();
 
+router.get('/getCategories', function(req, res) {
+
+	(async (blogAdminModel, res) => {
+		const categories		= blogAdminModel.getCategories();
+
+		res.json( {categories : await categories});
+	})(req.app.get('blogAdminModel'), res);
+
+});
+
 // Get list of blogs
 router.get('/getEditList', function(req, res) {
 	(async (blogAdminModel, res) => {
@@ -33,7 +43,7 @@ router.get('/getPost/:id', function(req, res) {
 router.post('/saveDraft', (req, res) => {
 
 	if(req.is('json')) {
-		(async (body) => {
+		(async body => {
 			const saveResponse = {
 				status	: await req.app.get('blogAdminModel').saveDraft(body),
 				reqBody	: body
@@ -47,10 +57,24 @@ router.post('/saveDraft', (req, res) => {
 	}
 })
 
+router.post('/addPost', (req, res) => {
+	if(req.is('json')) {
+		(async body => {
+			const 	savePost 				= await req.app.get('blogAdminModel').addPost(body),
+					savePostCategories		= req.app.get('blogAdminModel').savePostCategories(savePost.insertId, body.categoryNamesSelected);
+
+			res.json({
+						savePost				: savePost,
+						savePostCategories		: await savePostCategories
+			});
+		})(req.body);
+	}
+})
+
 router.post('/updatePost', (req, res) => {
 
 	if(req.is('json')) {
-		(async (body) => {
+		(async body => {
 			const 	savePost 				= req.app.get('blogAdminModel').updatePost(body),
 					deletePostCategories	= req.app.get('blogAdminModel').deletePostCategories(body.entryId, body.categoryNamesSelected),
 					savePostCategories		= req.app.get('blogAdminModel').savePostCategories(body.entryId, body.categoryNamesSelected);
