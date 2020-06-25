@@ -71,6 +71,19 @@ router.post('/addPost', (req, res) => {
 	}
 })
 
+router.post('/updateCategory', (req, res) => {
+	if(req.is('json')) {
+		(async body => {
+			const 	status = await req.app.get('blogAdminModel').updateCategory(body);
+
+			res.json(status);
+		})(req.body)
+
+	} else {
+		res.json({status	: 'Incorrent Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
+	}
+})
+
 router.post('/updatePost', (req, res) => {
 
 	if(req.is('json')) {

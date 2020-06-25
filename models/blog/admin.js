@@ -180,6 +180,32 @@ class blogAdmin {
 		})
 	}
 
+	updateCategory(body) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(`	UPDATE categories
+							SET name		= ?,
+								updatedAt	= now()
+							WHERE id = ?`, [body.name, body.id],
+				(err, rows) => {
+					if(err) {
+						if(app.get('env') === "development") {
+							console.log("********* updateCategory(body) error ***********");
+							console.log(err);
+						}
+
+						resolve({
+							failed: true
+						});
+					}
+
+					resolve(rows);
+				})
+		}).catch(err => {
+			console.log("********* Promise Error: updateCategory() *********");
+			console.log(err);
+		})
+	}
+
 	updatePost(body) {
 		return new Promise((resolve, reject) => {
 			this.ds.query(`	UPDATE entries
