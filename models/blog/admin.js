@@ -125,6 +125,32 @@ class blogAdmin {
 		})
 	}
 
+	addCategory(name) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(	`	INSERT INTO categories
+								SET name	= ?`,
+								[name],
+				(err, rows) => {
+					if(err) {
+						if(app.get('env') === "development") {
+							console.log("********* addCategory(name) error ***********");
+							console.log(err);
+						}
+
+						resolve({
+							failed	: true,
+							message	: (err.errno === 1062 ? `Duplicate Category Submitted. Check if ${name} already exists.` : null)
+						});
+					}
+
+					resolve(rows);
+				})
+		}).catch(err => {
+			console.log("********* Promise Error: addCategory(name) *********");
+			console.log(err);
+		})
+	}
+
 	addPost(body) {
 		return new Promise((resolve, reject) => {
 			this.ds.query(	`	INSERT INTO entries

@@ -57,11 +57,21 @@ router.post('/saveDraft', (req, res) => {
 	}
 })
 
+router.post('/addCategory', (req, res) => {
+	if(req.is('json')) {
+		(async body => {
+			const 	addedCategory = await req.app.get('blogAdminModel').addCategory(body.newCategory);
+
+			res.json({addedCategory});
+		})(req.body);
+	}
+})
+
 router.post('/addPost', (req, res) => {
 	if(req.is('json')) {
 		(async body => {
-			const 	savePost 				= await req.app.get('blogAdminModel').addPost(body),
-					savePostCategories		= req.app.get('blogAdminModel').savePostCategories(savePost.insertId, body.categoryNamesSelected);
+			const 	savePost 			= await req.app.get('blogAdminModel').addPost(body),
+					savePostCategories	= req.app.get('blogAdminModel').savePostCategories(savePost.insertId, body.categoryNamesSelected);
 
 			res.json({
 						savePost				: savePost,
@@ -74,6 +84,7 @@ router.post('/addPost', (req, res) => {
 router.post('/updateCategory', (req, res) => {
 	if(req.is('json')) {
 		(async body => {
+			// if body.name is empty but body.id exists, then deactivate the category
 			const 	status = await req.app.get('blogAdminModel').updateCategory(body);
 
 			res.json(status);
