@@ -11,10 +11,31 @@ router.get('/getCategories', function(req, res) {
 
 });
 
+// /getPost/191
+router.get('/getPost/:id', function(req, res) {
+
+	(async (blogAdminModel, res, id) => {
+		const	post			= blogAdminModel.getPostById(id),
+				postCategories	= blogAdminModel.getPostCategories(id),
+				categories		= blogAdminModel.getCategories(),
+				series			= blogAdminModel.getSeries(),
+				postSeries		= blogAdminModel.getPostSeriesById(id);
+
+		res.json( {
+					post			: await post,
+					postCategories	: await postCategories,
+					categories		: await categories,
+					series			: await series,
+					postSeries		: await postSeries
+		});
+	})(req.app.get('blogAdminModel'), res, req.params.id);
+
+});
+
 // Get list of blogs
-router.get('/getEditList', function(req, res) {
+router.get('/getPosts', function(req, res) {
 	(async (blogAdminModel, res) => {
-		const	posts	= blogAdminModel.getPostsToEdit();
+		const	posts	= blogAdminModel.getPosts();
 
 		res.json( {
 					posts	: await posts
@@ -23,19 +44,18 @@ router.get('/getEditList', function(req, res) {
 
 });
 
-// /getPost/191
-router.get('/getPost/:id', function(req, res) {
+// Get list of series
+router.get('/getSeries', function(req, res) {
+	(async (blogAdminModel, res) => {
+		res.json( {	series	: await blogAdminModel.getSeries() });
+	})(req.app.get('blogAdminModel'), res);
+
+});
+
+router.get('/getSeriesPostsById/:id', function(req, res) {
 
 	(async (blogAdminModel, res, id) => {
-		const	post			= blogAdminModel.getPostById(id),
-				postCategories	= blogAdminModel.getPostCategories(id),
-				categories		= blogAdminModel.getCategories();
-
-		res.json( {
-					post			: await post,
-					postCategories	: await postCategories,
-					categories		: await categories
-		});
+		res.json( { seriesPosts : await blogAdminModel.getSeriesPostsById(id) });
 	})(req.app.get('blogAdminModel'), res, req.params.id);
 
 });
@@ -81,6 +101,16 @@ router.post('/addPost', (req, res) => {
 	}
 })
 
+router.post('/addSeries', (req, res) => {
+	if(req.is('json')) {
+		(async body => {
+			const 	addSeries = await req.app.get('blogAdminModel').addSeries(body.newSeries);
+
+			res.json({addSeries});
+		})(req.body);
+	}
+})
+
 router.post('/updateCategory', (req, res) => {
 	if(req.is('json')) {
 		(async body => {
@@ -108,6 +138,20 @@ router.post('/updatePost', (req, res) => {
 						deletePostCategories	: await deletePostCategories,
 						savePostCategories		: await savePostCategories
 			});
+		})(req.body)
+
+	} else {
+		res.json({status	: 'Incorrent Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
+	}
+})
+
+router.post('/updateSeries', (req, res) => {
+	if(req.is('json')) {
+		(async body => {
+			// if body.name is empty but body.id exists, then deactivate the series
+			const 	status = body.name.trim().length ? req.app.get('blogAdminModel').updateSeries(body) : req.app.get('blogAdminModel').deactivateSeries(body.id);
+
+			res.json(await status);
 		})(req.body)
 
 	} else {
