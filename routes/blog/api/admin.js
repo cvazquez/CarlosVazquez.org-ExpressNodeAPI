@@ -91,11 +91,13 @@ router.post('/addPost', (req, res) => {
 	if(req.is('json')) {
 		(async body => {
 			const 	savePost 			= await req.app.get('blogAdminModel').addPost(body),
-					savePostCategories	= req.app.get('blogAdminModel').savePostCategories(savePost.insertId, body.categoryNamesSelected);
+					savePostCategories	= req.app.get('blogAdminModel').savePostCategories(savePost.insertId, body.categoryNamesSelected),
+					savePostSeries		= req.app.get('blogAdminModel').savePostSeries(savePost.insertId, body.seriesNameSelected);
 
 			res.json({
 						savePost				: savePost,
-						savePostCategories		: await savePostCategories
+						savePostCategories		: await savePostCategories,
+						savePostSeries			: await savePostSeries
 			});
 		})(req.body);
 	}
@@ -131,12 +133,16 @@ router.post('/updatePost', (req, res) => {
 		(async body => {
 			const 	savePost 				= req.app.get('blogAdminModel').updatePost(body),
 					deletePostCategories	= req.app.get('blogAdminModel').deletePostCategories(body.entryId, body.categoryNamesSelected),
-					savePostCategories		= req.app.get('blogAdminModel').savePostCategories(body.entryId, body.categoryNamesSelected);
+					savePostCategories		= req.app.get('blogAdminModel').savePostCategories(body.entryId, body.categoryNamesSelected),
+					deletePostSeries		= req.app.get('blogAdminModel').deletePostSeries(body.entryId, body.seriesNameSelected),
+					savePostSeries			= req.app.get('blogAdminModel').savePostSeries(body.entryId, body.seriesNameSelected);
 
 			res.json({
 						savePost				: await savePost,
 						deletePostCategories	: await deletePostCategories,
-						savePostCategories		: await savePostCategories
+						savePostCategories		: await savePostCategories,
+						deletePostSeries		: await deletePostSeries,
+						savePostSeries			: await savePostSeries
 			});
 		})(req.body)
 

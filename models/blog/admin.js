@@ -219,7 +219,8 @@ class blogAdmin {
 	addCategory(name) {
 		return new Promise((resolve, reject) => {
 			this.ds.query(	`	INSERT INTO categories
-								SET name	= ?`,
+								SET name		= ?,
+									createdAt = now()`,
 								[name],
 				(err, rows) => {
 					if(err) {
@@ -250,7 +251,8 @@ class blogAdmin {
 									content			= ?,
 									metaDescription	= ?,
 									metaKeyWords	= ?,
-									publishAt		= ?`,
+									publishAt		= ?,
+									createdAt 		= now()`,
 								[body.title, body.teaser, body.content, body.metaDescription, body.metaKeyWords, body.publishAt],
 				(err, rows) => {
 					if(err) {
@@ -275,7 +277,8 @@ class blogAdmin {
 	addSeries(name) {
 		return new Promise((resolve, reject) => {
 			this.ds.query(	`	INSERT INTO series
-								SET name	= ?`,
+								SET name		= ?,
+									createdAt	= now()`,
 								[name],
 				(err, rows) => {
 					if(err) {
@@ -301,8 +304,9 @@ class blogAdmin {
 	saveDraft(body) {
 		return new Promise((resolve, reject) => {
 			this.ds.query(	`	INSERT INTO entrydrafts
-								SET entryId = ?,
-									content	= ?;`, [body.entryId, body.content],
+								SET entryId 	= ?,
+									content		= ?,
+									createdAt 	= now();`, [body.entryId, body.content],
 								(err, rows) => {
 									if(err) {
 										if(app.get('env') === "development") {
@@ -447,7 +451,7 @@ class blogAdmin {
 			(err, rows) => {
 				if(err) {
 					if(app.get('env') === "development") {
-						console.log("********* updatePostCategories(body) error ***********");
+						console.log("********* deletePostCategories(entryId, categoryNames) error ***********");
 						console.log(err);
 					}
 
@@ -459,27 +463,21 @@ class blogAdmin {
 				resolve(rows);
 			}
 		)}).catch(err => {
-			console.log("********* updatePostCategories(body) Promise Error *********");
+			console.log("********* deletePostCategories(entryId, categoryNames) Promise Error *********");
 			console.log(err);
 		})
 	}
 
 	savePostCategories(entryId, categoryNames) {
-		const categoryInsertValues = [];
-
-		categoryNames.forEach(categoryName => {
-			categoryInsertValues.push([entryId, categoryName]);
-		});
-
 		return new Promise((resolve, reject) => {
-			this.ds.query(`	INSERT IGNORE INTO entrycategories (entryId, categoryId)
-							SELECT ?, c.id
+			this.ds.query(`	INSERT IGNORE INTO entrycategories (entryId, categoryId, createdAt)
+							SELECT ?, c.id, now()
 							FROM categories c
 							WHERE c.name IN (?);`, [entryId, categoryNames],
 			(err, rows) => {
 				if(err) {
 					if(app.get('env') === "development") {
-						console.log("********* savePostCategories(body) error ***********");
+						console.log("********* savePostCategories(entryId, categoryNames) error ***********");
 						console.log(err);
 					}
 
@@ -491,7 +489,64 @@ class blogAdmin {
 				resolve(rows);
 			}
 		)}).catch(err => {
-			console.log("********* savePostCategories(body) Promise Error *********");
+			console.log("********* savePostCategories(entryId, categoryNames) Promise Error *********");
+			console.log(err);
+		})
+	}
+
+	deletePostSeries(entryId, seriesNames) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(`
+							DELETE es
+							FROM series s
+							INNER JOIN seriesentries es ON	es.entryId = ?
+															AND es.seriesId = s.id
+							WHERE 	s.name NOT IN (?);`,
+							[entryId, seriesNames],
+			(err, rows) => {
+				if(err) {
+					if(app.get('env') === "development") {
+						console.log("********* deletePostSeries(entryId, seriesNames) error ***********");
+						console.log(err);
+					}
+
+					resolve({
+						failed: true
+					});
+				}
+
+				resolve(rows);
+			}
+		)}).catch(err => {
+			console.log("********* deletePostSeries(entryId, seriesNames) Promise Error *********");
+			console.log(err);
+		})
+	}
+
+	savePostSeries(entryId, seriesNames) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(`	INSERT IGNORE INTO seriesentries (entryId, seriesId, createdAt)
+							SELECT ?, s.id, now()
+							FROM series s
+							LEFT JOIN seriesentries se ON se.seriesId = s.id AND se.entryId = ?
+							WHERE 	s.name IN (?)
+									AND se.seriesId IS NULL;`, [entryId, entryId, seriesNames],
+			(err, rows) => {
+				if(err) {
+					if(app.get('env') === "development") {
+						console.log("********* savePostSeries(entryId, seriesNames) error ***********");
+						console.log(err);
+					}
+
+					resolve({
+						failed: true
+					});
+				}
+
+				resolve(rows);
+			}
+		)}).catch(err => {
+			console.log("********* savePostSeries(entryId, seriesNames) Promise Error *********");
 			console.log(err);
 		})
 	}
