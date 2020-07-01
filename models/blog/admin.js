@@ -380,7 +380,34 @@ class blogAdmin {
 				resolve(rows);
 			}
 		)}).catch(err => {
-			console.log("********* Promise Error *********");
+			console.log("********* Promise Error updatePost(body) *********");
+			console.log(err);
+		})
+	}
+
+	updatePostSeriesSequence(postId, seriesId, sequence) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(`	UPDATE seriesentries
+							SET	sequence = ?
+							WHERE 	seriesId = ?
+									AND entryId = ?`,
+							[sequence, seriesId, postId],
+					(err, rows) => {
+						if(err) {
+							if(app.get('env') === "development") {
+								console.log("********* updatePostSeriesSequence(postId, seriesId, sequence");
+								console.log(err);
+							}
+
+							resolve({
+								failed: true
+							});
+						}
+
+						resolve(rows);
+					})
+		}).catch(err => {
+			console.log("******* Promise Error updatePostSeriesSequence()");
 			console.log(err);
 		})
 	}

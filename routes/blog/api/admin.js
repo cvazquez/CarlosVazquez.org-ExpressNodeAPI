@@ -151,6 +151,18 @@ router.post('/updatePost', (req, res) => {
 	}
 })
 
+router.post('/updatePostSeriesSequence', (req, res) => {
+	if(req.is('json')) {
+		(async body => {
+			const saveSequence	= req.app.get('blogAdminModel').updatePostSeriesSequence(body.postId, body.seriesId, body.sequence);
+
+			res.json({
+				saveSequence	: await saveSequence
+			});
+		})(req.body);
+	}
+})
+
 router.post('/updateSeries', (req, res) => {
 	if(req.is('json')) {
 		(async body => {
