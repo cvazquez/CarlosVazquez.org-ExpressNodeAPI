@@ -33,6 +33,37 @@ class blogAdmin {
 		})
 	}
 
+	getFlickrSets(noEntry) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(`	SELECT	fs.id,
+									fs.title,
+									efs.entryId
+							FROM flickrsets fs
+							LEFT JOIN entryflickrsets efs ON 	efs.flickrSetId = fs.id
+																AND efs.deletedAt IS NULL
+							WHERE fs.deletedAt IS NULL`
+							+ (noEntry ? ` AND efs.flickrSetId IS NULL ` : ` `) +
+							`ORDER BY fs.title;`,
+					(err, rows) => {
+						if(err) {
+							if(app.get('env') === "development") {
+								console.log("********* getFlickrSets() error ***********");
+								console.log(err);
+							}
+
+							resolve({
+								failed	: true
+							})
+						}
+
+						resolve(rows);
+					})
+		}).catch(err => {
+			console.log("*********PROMISE Error getFlickrSets()*******");
+			console.log(err);
+		})
+	}
+
 	getPostById(entryId) {
 		return new Promise(resolve => {
 			this.ds.query(`
@@ -44,8 +75,11 @@ class blogAdmin {
 						metaKeyWords,
 						Date_Format(e.createdAt, '%Y-%m-%d %H:%i') AS createdAt,
 						Date_Format(e.publishAt, '%Y-%m-%d %H:%i') AS publishAt,
-						Date_Format(e.deletedAt, '%Y-%m-%d %H:%i') AS deletedAt
+						Date_Format(e.deletedAt, '%Y-%m-%d %H:%i') AS deletedAt,
+						efs.flickrSetId
 				FROM entries e
+				LEFT JOIN entryflickrsets efs ON 	efs.entryId = e.id
+													AND efs.deletedAt IS NULL
 				WHERE e.id = ?;`, entryId,
 				(err, rows) => {
 					if (err) {
@@ -549,6 +583,31 @@ class blogAdmin {
 			console.log(err);
 		})
 	}
+
+	savePostFlickrSet(entryId, flickrSetId) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(`	INSERT IGNORE INTO entryflickrsets (entryId, flickrSetId, createdAt)
+							VALUES (?, ?, now())`, [entryId, flickrSetId],
+				(err, rows) => {
+					if(err) {
+						if(app.get("env") === "development") {
+							console.log("*********savePostFlickrSet(entryId, flickrSetId)*******");
+							console.log(err);
+						}
+
+						resolve({
+							failed	: true
+						})
+					}
+
+					resolve(rows);
+				})
+		}).catch(err => {
+			console.log("**********savePostFlickrSet(entryId, flickrSetId) Promise Error********");
+			console.log(err);
+		})
+	}
+
 
 	savePostSeries(entryId, seriesNames) {
 		return new Promise((resolve, reject) => {
