@@ -43,7 +43,8 @@ class blogAdmin {
 																AND efs.deletedAt IS NULL
 							WHERE fs.deletedAt IS NULL`
 							+ (noEntry ? ` AND efs.flickrSetId IS NULL ` : ` `) +
-							`ORDER BY fs.title;`,
+							`	GROUP BY fs.id
+								ORDER BY fs.title;`,
 					(err, rows) => {
 						if(err) {
 							if(app.get('env') === "development") {
@@ -296,7 +297,8 @@ class blogAdmin {
 						}
 
 						resolve({
-							failed: true
+							failed: true,
+							message	: (err.errno === 1062 ? `"${body.title}" already exists. Create a new title.` : null)
 						});
 					}
 

@@ -108,9 +108,9 @@ router.post('/addPost', (req, res) => {
 	if(req.is('json')) {
 		(async body => {
 			const 	savePost 			= await req.app.get('blogAdminModel').addPost(body),
-					savePostCategories	= req.app.get('blogAdminModel').savePostCategories(savePost.insertId, body.categoryNamesSelected),
-					savePostSeries		= req.app.get('blogAdminModel').savePostSeries(savePost.insertId, body.seriesNameSelected),
-					savePostFlickrSet	= req.app.get('blogAdminModel').savePostFlickrSet(savePost.insertId, body.flickrSetId);
+					savePostCategories	= body.categoryNamesSelected.length ? req.app.get('blogAdminModel').savePostCategories(savePost.insertId, body.categoryNamesSelected) : null,
+					savePostSeries		= body.seriesNameSelected.length ? req.app.get('blogAdminModel').savePostSeries(savePost.insertId, body.seriesNameSelected) : null,
+					savePostFlickrSet	= body.flickrSetId.length ? req.app.get('blogAdminModel').savePostFlickrSet(savePost.insertId, body.flickrSetId) : null;
 
 			res.json({
 						savePost				: savePost,
