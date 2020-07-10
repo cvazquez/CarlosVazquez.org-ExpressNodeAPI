@@ -557,6 +557,31 @@ class blogAdmin {
 		})
 	}
 
+	deactivatePostById(id) {
+		return new Promise((resolve, reject) => {
+			this.ds.query(`	UPDATE entries
+							SET deletedAt = now()
+							WHERE id = ?`, [id],
+				(err, rows) => {
+					if(err) {
+						if(app.get('env') === "development") {
+							console.log("********* deactivatePostById(id) error ***********");
+							console.log(err);
+						}
+
+						resolve({
+							failed: true
+						});
+					}
+
+					resolve(rows);
+				})
+		}).catch(err => {
+			console.log("********* deactivatePostById(id) Promise Error *********");
+			console.log(err);
+		})
+	}
+
 	deletePostSeries(entryId, seriesNames) {
 		return new Promise((resolve, reject) => {
 			this.ds.query(`

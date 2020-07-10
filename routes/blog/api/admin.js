@@ -1,6 +1,15 @@
 const	express 		= require('express'),
 		router  		= express.Router();
 
+
+router.get('/deactivatePostById/:id', (req, res) => {
+	(async (blogAdminModel, res, id) => {
+		res.json({
+			deactivated	: await blogAdminModel.deactivatePostById(id)
+		})
+	})(req.app.get('blogAdminModel'), res, req.params.id);
+});
+
 router.get('/getCategories', function(req, res) {
 
 	(async (blogAdminModel, res) => {
