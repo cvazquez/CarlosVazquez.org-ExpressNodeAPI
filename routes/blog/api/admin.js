@@ -123,9 +123,9 @@ router.post('/addPost', (req, res) => {
 
 			res.json({
 						savePost				: savePost,
-						savePostCategories		: await savePostCategories,
-						savePostSeries			: await savePostSeries,
-						savePostFlickrSet		: await savePostFlickrSet
+						savedPostCategories		: await savePostCategories,
+						savedPostSeries			: await savePostSeries,
+						savedPostFlickrSet		: await savePostFlickrSet
 			});
 		})(req.body);
 	}
@@ -163,16 +163,16 @@ router.post('/updatePost', (req, res) => {
 					deletePostCategories	= req.app.get('blogAdminModel').deletePostCategories(body.entryId, body.categoryNamesSelected),
 					savePostCategories		= req.app.get('blogAdminModel').savePostCategories(body.entryId, body.categoryNamesSelected),
 					deletePostSeries		= req.app.get('blogAdminModel').deletePostSeries(body.entryId, body.seriesNameSelected),
-					savePostSeries			= req.app.get('blogAdminModel').savePostSeries(body.entryId, body.seriesNameSelected),
+					savePostSeries			= body.seriesNameSelected.length && req.app.get('blogAdminModel').savePostSeries(body.entryId, body.seriesNameSelected),
 					savePostFlickrSet		= req.app.get('blogAdminModel').savePostFlickrSet(body.entryId, body.flickrSetId);
 
 			res.json({
 						savePost				: await savePost,
-						deletePostCategories	: await deletePostCategories,
-						savePostCategories		: await savePostCategories,
-						deletePostSeries		: await deletePostSeries,
-						savePostSeries			: await savePostSeries,
-						savePostFlickrSet		: await savePostFlickrSet
+						deletedPostCategories	: await deletePostCategories,
+						savedPostCategories		: await savePostCategories,
+						deletedPostSeries		: await deletePostSeries,
+						savedPostSeries			: await savePostSeries,
+						savedPostFlickrSet		: await savePostFlickrSet
 			});
 		})(req.body)
 

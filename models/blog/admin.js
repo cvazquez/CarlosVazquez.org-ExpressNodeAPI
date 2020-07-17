@@ -20,7 +20,7 @@ class blogAdmin {
 						console.log(err);
 					}
 
-					resolve({
+					reject({
 						failed	: true
 					})
 				}
@@ -30,6 +30,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: getCategories() *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -52,7 +54,7 @@ class blogAdmin {
 								console.log(err);
 							}
 
-							resolve({
+							reject({
 								failed	: true
 							})
 						}
@@ -62,6 +64,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("*********PROMISE Error getFlickrSets()*******");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -89,7 +93,7 @@ class blogAdmin {
 							console.log(err);
 						}
 
-						resolve({
+						reject({
 							failed	: true
 						})
 					}
@@ -99,6 +103,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: getPostById() *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -117,7 +123,7 @@ class blogAdmin {
 								console.log(err);
 							}
 
-							resolve({
+							reject({
 								failed	: true
 							})
 						}
@@ -127,6 +133,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: getPostCategories() *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -147,7 +155,7 @@ class blogAdmin {
 							console.log(err);
 						}
 
-						resolve({
+						reject({
 							failed	: true
 						})
 					}
@@ -157,6 +165,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: getPostsToEdit(body) *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -176,7 +186,7 @@ class blogAdmin {
 							console.log(err);
 						}
 
-						resolve({
+						reject({
 							failed	: true
 						})
 					}
@@ -186,6 +196,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: getPostSeriesById(id) *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -206,7 +218,7 @@ class blogAdmin {
 								console.log(err);
 							}
 
-							resolve({
+							reject({
 								failed	: true
 							});
 						}
@@ -216,6 +228,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: getSeries() *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -238,7 +252,7 @@ class blogAdmin {
 								console.log(err);
 							}
 
-							resolve({
+							reject({
 								failed	: true
 							});
 						}
@@ -248,6 +262,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: getSeriesPostsById(id) *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -264,7 +280,7 @@ class blogAdmin {
 							console.log(err);
 						}
 
-						resolve({
+						reject({
 							failed	: true,
 							message	: (err.errno === 1062 ? `Duplicate Category Submitted. Check if ${name} already exists.` : null)
 						});
@@ -275,6 +291,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: addCategory(name) *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -296,7 +314,7 @@ class blogAdmin {
 							console.log(err);
 						}
 
-						resolve({
+						reject({
 							failed: true,
 							message	: (err.errno === 1062 ? `"${body.title}" already exists. Create a new title.` : null)
 						});
@@ -307,6 +325,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: addPost(body) *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -323,7 +343,7 @@ class blogAdmin {
 							console.log(err);
 						}
 
-						resolve({
+						reject({
 							failed	: true,
 							message	: (err.errno === 1062 ? `Duplicate series Submitted. Check if ${name} already exists.` : null)
 						});
@@ -334,6 +354,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: addSeries(name) *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -350,8 +372,9 @@ class blogAdmin {
 											console.log(err);
 										}
 
-										resolve({
-											failed: true
+										reject({
+											failed	: true,
+											message	: "Error Saving Draft"
 										});
 									}
 
@@ -360,6 +383,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: saveDraft() *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -376,8 +401,9 @@ class blogAdmin {
 							console.log(err);
 						}
 
-						resolve({
-							failed: true
+						reject({
+							failed	: true,
+							message	: "Error Updating Category"
 						});
 					}
 
@@ -386,6 +412,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: updateCategory() *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -408,8 +436,9 @@ class blogAdmin {
 						console.log(err);
 					}
 
-					resolve({
-						failed: true
+					reject({
+						failed	: true,
+						message	: "Error Updating Post"
 					});
 				}
 
@@ -418,6 +447,8 @@ class blogAdmin {
 		)}).catch(err => {
 			console.log("********* Promise Error updatePost(body) *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -435,8 +466,9 @@ class blogAdmin {
 								console.log(err);
 							}
 
-							resolve({
-								failed: true
+							reject({
+								failed	: true,
+								message	: "Error Updating Series Sequence"
 							});
 						}
 
@@ -445,6 +477,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("******* Promise Error updatePostSeriesSequence()");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -461,8 +495,9 @@ class blogAdmin {
 							console.log(err);
 						}
 
-						resolve({
-							failed: true
+						reject({
+							failed	: true,
+							message	: "Error Updating Series"
 						});
 					}
 
@@ -471,6 +506,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* Promise Error: updateSeries(body) *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -487,18 +524,19 @@ class blogAdmin {
 							console.log(err);
 						}
 
-						resolve({
-							failed: true
+						reject({
+							failed	: true,
+							message	: "Error Deactivating Series"
 						});
 					}
-
-					console.log(rows)
 
 					resolve(rows);
 				})
 		}).catch(err => {
 			console.log("********* Promise Error: deactivateSeries(id) *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -518,8 +556,9 @@ class blogAdmin {
 						console.log(err);
 					}
 
-					resolve({
-						failed: true
+					reject({
+						failed	: true,
+						message	: "Error Removing Categories"
 					});
 				}
 
@@ -528,6 +567,8 @@ class blogAdmin {
 		)}).catch(err => {
 			console.log("********* deletePostCategories(entryId, categoryNames) Promise Error *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -544,8 +585,9 @@ class blogAdmin {
 						console.log(err);
 					}
 
-					resolve({
-						failed: true
+					reject({
+						failed	: true,
+						message	: "Error Saving Categories"
 					});
 				}
 
@@ -554,6 +596,8 @@ class blogAdmin {
 		)}).catch(err => {
 			console.log("********* savePostCategories(entryId, categoryNames) Promise Error *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -569,8 +613,9 @@ class blogAdmin {
 							console.log(err);
 						}
 
-						resolve({
-							failed: true
+						reject({
+							failed	: true,
+							message	: "Error Deactivating Post"
 						});
 					}
 
@@ -579,6 +624,8 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("********* deactivatePostById(id) Promise Error *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -598,8 +645,9 @@ class blogAdmin {
 						console.log(err);
 					}
 
-					resolve({
-						failed: true
+					reject({
+						failed	: true,
+						message	: "Error Removing Series"
 					});
 				}
 
@@ -608,6 +656,8 @@ class blogAdmin {
 		)}).catch(err => {
 			console.log("********* deletePostSeries(entryId, seriesNames) Promise Error *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
@@ -622,9 +672,10 @@ class blogAdmin {
 							console.log(err);
 						}
 
-						resolve({
-							failed	: true
-						})
+						reject({
+							failed	: true,
+							message	: "Error Saving Flickr Set"
+						});
 					}
 
 					resolve(rows);
@@ -632,11 +683,14 @@ class blogAdmin {
 		}).catch(err => {
 			console.log("**********savePostFlickrSet(entryId, flickrSetId) Promise Error********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
 
 	savePostSeries(entryId, seriesNames) {
+		console.log(this)
 		return new Promise((resolve, reject) => {
 			this.ds.query(`	INSERT IGNORE INTO seriesentries (entryId, seriesId, createdAt)
 							SELECT ?, s.id, now()
@@ -651,8 +705,9 @@ class blogAdmin {
 						console.log(err);
 					}
 
-					resolve({
-						failed: true
+					reject({
+						failed	: true,
+						message	: "Error Saving Series Name"
 					});
 				}
 
@@ -661,6 +716,8 @@ class blogAdmin {
 		)}).catch(err => {
 			console.log("********* savePostSeries(entryId, seriesNames) Promise Error *********");
 			console.log(err);
+
+			return err;
 		})
 	}
 
