@@ -78,6 +78,7 @@ router.get('/getSeries', function(req, res) {
 
 });
 
+// /blog/api/admin/getSeriesPostsById/4
 router.get('/getSeriesPostsById/:id', function(req, res) {
 
 	(async (blogAdminModel, res, id) => {
@@ -99,7 +100,7 @@ router.post('/saveDraft', (req, res) => {
 		})(req.body)
 
 	} else {
-		res.json({status	: 'Incorrent Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
+		res.json({status	: 'Incorrect Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
 	}
 })
 
@@ -110,6 +111,8 @@ router.post('/addCategory', (req, res) => {
 
 			res.json({addedCategory});
 		})(req.body);
+	} else {
+		res.json({status	: 'Incorrect Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
 	}
 })
 
@@ -128,6 +131,8 @@ router.post('/addPost', (req, res) => {
 						savedPostFlickrSet		: await savePostFlickrSet
 			});
 		})(req.body);
+	} else {
+		res.json({status	: 'Incorrect Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
 	}
 })
 
@@ -138,6 +143,8 @@ router.post('/addSeries', (req, res) => {
 
 			res.json({addSeries});
 		})(req.body);
+	} else {
+		res.json({status	: 'Incorrect Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
 	}
 })
 
@@ -151,20 +158,21 @@ router.post('/updateCategory', (req, res) => {
 		})(req.body)
 
 	} else {
-		res.json({status	: 'Incorrent Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
+		res.json({status	: 'Incorrect Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
 	}
 })
 
 router.post('/updatePost', (req, res) => {
 
 	if(req.is('json')) {
-		(async body => {
-			const 	savePost 				= req.app.get('blogAdminModel').updatePost(body),
-					deletePostCategories	= req.app.get('blogAdminModel').deletePostCategories(body.entryId, body.categoryNamesSelected),
-					savePostCategories		= req.app.get('blogAdminModel').savePostCategories(body.entryId, body.categoryNamesSelected),
-					deletePostSeries		= req.app.get('blogAdminModel').deletePostSeries(body.entryId, body.seriesNameSelected),
-					savePostSeries			= body.seriesNameSelected.length && req.app.get('blogAdminModel').savePostSeries(body.entryId, body.seriesNameSelected),
-					savePostFlickrSet		= req.app.get('blogAdminModel').savePostFlickrSet(body.entryId, body.flickrSetId);
+		(async (body, blogAdminModel) => {
+			const 	savePost 				= blogAdminModel.updatePost(body),
+					deletePostCategories	= blogAdminModel.deletePostCategories(body.entryId, body.categoryNamesSelected),
+					savePostCategories		= body.categoryNamesSelected.length && blogAdminModel.savePostCategories(body.entryId, body.categoryNamesSelected),
+					deletePostSeries		= blogAdminModel.deletePostSeries(body.entryId, body.seriesNameSelected),
+					savePostSeries			= body.seriesNameSelected.length && blogAdminModel.savePostSeries(body.entryId, body.seriesNameSelected),
+					savePostFlickrSet		= body.flickrSetId.length && blogAdminModel.savePostFlickrSet(body.entryId, body.flickrSetId),
+					deletePostFlickrSet		= blogAdminModel.deletePostFlickrSet(body.entryId, body.flickrSetId);
 
 			res.json({
 						savePost				: await savePost,
@@ -172,12 +180,13 @@ router.post('/updatePost', (req, res) => {
 						savedPostCategories		: await savePostCategories,
 						deletedPostSeries		: await deletePostSeries,
 						savedPostSeries			: await savePostSeries,
-						savedPostFlickrSet		: await savePostFlickrSet
+						savedPostFlickrSet		: await savePostFlickrSet,
+						deletePostFlickrSet		: await deletePostFlickrSet
 			});
-		})(req.body)
+		})(req.body, req.app.get('blogAdminModel'))
 
 	} else {
-		res.json({status	: 'Incorrent Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
+		res.json({status	: 'Incorrect Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
 	}
 })
 
@@ -190,6 +199,8 @@ router.post('/updatePostSeriesSequence', (req, res) => {
 				saveSequence	: await saveSequence
 			});
 		})(req.body);
+	} else {
+		res.json({status	: 'Incorrect Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
 	}
 })
 
@@ -203,7 +214,7 @@ router.post('/updateSeries', (req, res) => {
 		})(req.body)
 
 	} else {
-		res.json({status	: 'Incorrent Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
+		res.json({status	: 'Incorrect Content Type: ' + req.headers["content-type"] + '. Expected application/json.'});
 	}
 })
 
