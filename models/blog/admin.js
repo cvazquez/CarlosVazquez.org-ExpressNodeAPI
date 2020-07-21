@@ -6,17 +6,13 @@ class blogAdmin {
 		this.ds = ds;
 	}
 
-	getCategories() {
+	getQueryResults(name, query, queryParams) {
 		return new Promise((resolve, reject) => {
-			this.ds.query(`
-				SELECT id, name
-				FROM categories
-				WHERE deletedAt IS NULL
-				ORDER BY name;`,
+			this.ds.query(query, [queryParams],
 			(err, rows) => {
 				if (err) {
 					if(app.get('env') === "development") {
-						console.log("********* getCategories(body) error ***********");
+						console.log("********* " + name + "() error ***********");
 						console.log(err);
 					}
 
@@ -28,84 +24,57 @@ class blogAdmin {
 				resolve(rows);
 			})
 		}).catch(err => {
-			console.log("********* Promise Error: getCategories() *********");
+			console.log("********* Promise Error: " + name + "() *********");
 			console.log(err);
 
 			return err;
 		})
+	}
+
+	getCategories() {
+		return this.getQueryResults(
+			"getCategories",
+			`SELECT id, name
+			FROM categories
+			WHERE deletedAt IS NULL
+			ORDER BY name;`
+		)
 	}
 
 	getFlickrSets(noEntry) {
-		return new Promise((resolve, reject) => {
-			this.ds.query(`	SELECT	fs.id,
-									fs.title,
-									efs.entryId
-							FROM flickrsets fs
-							LEFT JOIN entryflickrsets efs ON 	efs.flickrSetId = fs.id
-																AND efs.deletedAt IS NULL
-							WHERE fs.deletedAt IS NULL`
-							+ (noEntry ? ` AND efs.flickrSetId IS NULL ` : ` `) +
-							`	GROUP BY fs.id
-								ORDER BY fs.title;`,
-					(err, rows) => {
-						if(err) {
-							if(app.get('env') === "development") {
-								console.log("********* getFlickrSets() error ***********");
-								console.log(err);
-							}
-
-							reject({
-								failed	: true
-							})
-						}
-
-						resolve(rows);
-					})
-		}).catch(err => {
-			console.log("*********PROMISE Error getFlickrSets()*******");
-			console.log(err);
-
-			return err;
-		})
+		return this.getQueryResults(
+			"getFlickrSets",
+			`	SELECT	fs.id,
+						fs.title,
+						efs.entryId
+				FROM flickrsets fs
+				LEFT JOIN entryflickrsets efs ON 	efs.flickrSetId = fs.id
+													AND efs.deletedAt IS NULL
+				WHERE fs.deletedAt IS NULL`
+				+ (noEntry ? ` AND efs.flickrSetId IS NULL ` : ` `) +
+				`	GROUP BY fs.id
+					ORDER BY fs.title;`,
+			[]
+		)
 	}
 
 	getPostById(entryId) {
-		return new Promise(resolve => {
-			this.ds.query(`
-				SELECT	e.id,
-						e.title,
-						e.teaser,
-						e.content,
-						metaDescription,
-						metaKeyWords,
-						Date_Format(e.createdAt, '%Y-%m-%d %H:%i') AS createdAt,
-						Date_Format(e.publishAt, '%Y-%m-%d %H:%i') AS publishAt,
-						Date_Format(e.deletedAt, '%Y-%m-%d %H:%i') AS deletedAt,
-						efs.flickrSetId
-				FROM entries e
-				LEFT JOIN entryflickrsets efs ON 	efs.entryId = e.id
-													AND efs.deletedAt IS NULL
-				WHERE e.id = ?;`, entryId,
-				(err, rows) => {
-					if (err) {
-						if(app.get('env') === "development") {
-							console.log("********* getPostById(body) error ***********");
-							console.log(err);
-						}
-
-						reject({
-							failed	: true
-						})
-					}
-
-				resolve(rows);
-			})
-		}).catch(err => {
-			console.log("********* Promise Error: getPostById() *********");
-			console.log(err);
-
-			return err;
-		})
+		return this.getQueryResults(
+			"getPostById",
+			`SELECT	e.id,
+					e.title,
+					e.teaser,
+					e.content,
+					metaDescription,
+					metaKeyWords,
+					Date_Format(e.createdAt, '%Y-%m-%d %H:%i') AS createdAt,
+					Date_Format(e.publishAt, '%Y-%m-%d %H:%i') AS publishAt,
+					Date_Format(e.deletedAt, '%Y-%m-%d %H:%i') AS deletedAt,
+					efs.flickrSetId
+			FROM entries e
+			LEFT JOIN entryflickrsets efs ON 	efs.entryId = e.id
+												AND efs.deletedAt IS NULL
+			WHERE e.id = ?;`, entryId);
 	}
 
 	getPostCategories(id) {
@@ -630,6 +599,8 @@ class blogAdmin {
 	}
 
 	deletePostSeries(entryId, seriesNames) {
+		seriesNames = seriesNames.length ? seriesNames : null;
+
 		return new Promise((resolve, reject) => {
 			this.ds.query(`
 							DELETE es
