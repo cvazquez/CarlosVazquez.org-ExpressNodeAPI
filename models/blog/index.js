@@ -191,9 +191,10 @@ class blog extends model {
 		return this.getQueryResults(
 			"getPostByTitleURL",
 			`	SELECT	e.id,
-							e.content,
-							e.title,
-							e.teaser
+						e.content,
+						e.title,
+						e.teaser,
+						Date_Format(e.publishAt, '%b %e, %Y') AS publishAt
 				FROM entryurls eu
 				INNER JOIN entries e ON e.id = eu.entryId
 				WHERE eu.titleURL = ?`, [titleURL]
