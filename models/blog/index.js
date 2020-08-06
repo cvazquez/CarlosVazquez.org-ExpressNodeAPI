@@ -84,7 +84,7 @@ class blog extends model {
 														AND fs.deletedAt IS NULL
 						INNER JOIN flickrsetphotos fsp ON	fsp.flickrSetId = fs.id
 															AND fsp.deletedAt IS NULL
-						INNER JOIN flickrsetphotourls fspu ON	fspu.flickrSetPhotoId = fsp.id
+						LEFT JOIN flickrsetphotourls fspu ON	fspu.flickrSetPhotoId = fsp.id
 																AND fspu.isActive = 1
 						WHERE eu.titleURL = ?
 						ORDER BY fsp.orderid`, [titleURL]
