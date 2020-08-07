@@ -54,6 +54,7 @@ class blog extends model {
 			INNER JOIN entryurls eu ON eu.entryId = e.id
 			WHERE	cu.name = ?
 					AND e.publishAt <= now()
+			GROUP BY e.id
 			ORDER BY e.publishAt DESC`, [categoryName]
 		)
 	}
