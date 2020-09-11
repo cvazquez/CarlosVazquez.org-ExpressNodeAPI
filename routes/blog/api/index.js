@@ -3,7 +3,7 @@ const	express 		= require('express'),
 
 let requestTracking	= {};
 
-router.all('*', function(req, res, next) {
+router.all('*', (req, res, next) => {
 	// Save visitor information
 
 	requestTracking	= {
@@ -17,22 +17,21 @@ router.all('*', function(req, res, next) {
 	next();
 })
 
-router.get('/tracking', function(req, res, next) {
+router.get('/tracking', (req, res, next) => {
 	req.app.get('blogModel').createVisit(requestTracking, () =>{});
 
 	res.json({});
 })
 
 // GET home page.
-router.get('/', function(req, res, next) {
-
-	// Run all queries at the same time through a promise
-	(async (blogModel, res) => {
-		const	latestPosts     	= blogModel.getLatestPosts(10),
-				latestComments  	= blogModel.getLatestComments(5),
-				topCategories   	= blogModel.getTopCategories(5),
-				latestSeries		= blogModel.getLatestSeries(5),
-				latestImagePosts	= blogModel.getImagePosts(5);
+router.get('/', async (req, res) => {
+	const	blogModel 			= req.app.get('blogModel'),
+			// Run all queries at the same time through a promise
+			latestPosts     	= blogModel.getLatestPosts(10),
+			latestComments  	= blogModel.getLatestComments(5),
+			topCategories   	= blogModel.getTopCategories(5),
+			latestSeries		= blogModel.getLatestSeries(5),
+			latestImagePosts	= blogModel.getImagePosts(5);
 
 		res.json( {
 					latestPosts			: await latestPosts,
@@ -41,20 +40,17 @@ router.get('/', function(req, res, next) {
 					latestSeries		: await latestSeries,
 					latestImagePosts	: await latestImagePosts
 		});
-	})(req.app.get('blogModel'), res);
-
 });
 
 // GET All Categories
-router.get('/getCategoriesPage', function(req, res, next) {
-
-	(async (blogModel, res) => {
-		const	categories      	= blogModel.getCategories(),
-				latestPosts     	= blogModel.getLatestPosts(5),
-				latestComments  	= blogModel.getLatestComments(5),
-				topCategories   	= blogModel.getTopCategories(5),
-				latestSeries		= blogModel.getLatestSeries(5),
-				latestImagePosts	= blogModel.getImagePosts(5);
+router.get('/getCategoriesPage', async (req, res) => {
+	const	blogModel 			= req.app.get('blogModel'),
+			categories      	= blogModel.getCategories(),
+			latestPosts     	= blogModel.getLatestPosts(5),
+			latestComments  	= blogModel.getLatestComments(5),
+			topCategories   	= blogModel.getTopCategories(5),
+			latestSeries		= blogModel.getLatestSeries(5),
+			latestImagePosts	= blogModel.getImagePosts(5);
 
 			res.json( {
 						categories			: await categories,
@@ -64,22 +60,19 @@ router.get('/getCategoriesPage', function(req, res, next) {
 						latestSeries		: await latestSeries,
 						latestImagePosts	: await latestImagePosts
 			});
-	})(req.app.get('blogModel'), res);
-
 });
 
-// GET A Single Category
-router.get('/getCategoryPageByName/:categoryName', function(req, res, next) {
-	// /getCategoryPageByName/About-Me
-
-	(async (blogModel, res, categoryName) => {
-		const	category			= blogModel.getCategoryByName(categoryName),
-				categoryPosts		= blogModel.getCategoryPosts(categoryName),
-				latestPosts     	= blogModel.getLatestPosts(5),
-				latestComments  	= blogModel.getLatestComments(5),
-				topCategories   	= blogModel.getTopCategories(5),
-				latestSeries		= blogModel.getLatestSeries(5),
-				latestImagePosts	= blogModel.getImagePosts(5);
+// GET A Single Category (ie. /getCategoryPageByName/About-Me )
+router.get('/getCategoryPageByName/:categoryName', async (req, res) => {
+	const	blogModel 			= req.app.get('blogModel'),
+			categoryName		= req.params.categoryName,
+			category			= blogModel.getCategoryByName(categoryName),
+			categoryPosts		= blogModel.getCategoryPosts(categoryName),
+			latestPosts     	= blogModel.getLatestPosts(5),
+			latestComments  	= blogModel.getLatestComments(5),
+			topCategories   	= blogModel.getTopCategories(5),
+			latestSeries		= blogModel.getLatestSeries(5),
+			latestImagePosts	= blogModel.getImagePosts(5);
 
 		res.json( {
 					category			: await category,
@@ -90,8 +83,6 @@ router.get('/getCategoryPageByName/:categoryName', function(req, res, next) {
 					latestSeries		: await latestSeries,
 					latestImagePosts	: await latestImagePosts
 		});
-	})(req.app.get('blogModel'), res, req.params.categoryName);
-
 });
 
 router.get('/getImagePosts', (req, res) => {
@@ -114,7 +105,7 @@ router.get('/getImagePosts', (req, res) => {
 	})(req.app.get('blogModel'), res);
 })
 
-router.get('/getPostPageByTitleURL/:titleURL', function(req, res, next) {
+router.get('/getPostPageByTitleURL/:titleURL', (req, res, next) => {
 	// /getPostPageByTitleURL/Brasil-Miami-air-flight-to-Sao-Paulo-Panama
 
 	(async (blogModel, res, titleURL) => {
@@ -144,7 +135,7 @@ router.get('/getPostPageByTitleURL/:titleURL', function(req, res, next) {
 });
 
 // Get all Posts
-router.get('/getPostSlugs', function(req, res, next) {
+router.get('/getPostSlugs', (req, res, next) => {
 	(async (blogModel, res) => {
 		res.json(	{
 						postSlugs	: await blogModel.getPostSlugs()

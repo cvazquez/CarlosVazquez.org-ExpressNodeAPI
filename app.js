@@ -7,6 +7,7 @@ const	createError     = require('http-errors'),
 		logger          = require('morgan'),
 		cors 			= require('cors'),
 		whitelist		= require('../config/variables').whitelist,
+		adminIPs		= require('../config/variables').adminIPs,
 		corsOptions		= {
 								origin: function (origin, callback) {
 									if (whitelist.indexOf(origin) !== -1 || !origin) {
@@ -29,6 +30,9 @@ const	createError     = require('http-errors'),
 app.set("blogDS", blogDS);
 app.set('blogModel', blogModel);
 app.set('blogAdminModel', blogAdminModel);
+
+
+app.set('adminIPs', adminIPs);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -70,10 +74,5 @@ app.use(function(err, req, res, next) {
 
   next();
 });
-
-
-
-
-//console.log(process)
 
 module.exports = app;
