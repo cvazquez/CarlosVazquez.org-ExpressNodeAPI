@@ -120,7 +120,7 @@ router.post('/saveDraft', async (req, res) => {
 router.post('/addCategory', async (req, res) => {
 	if(req.is('json')) {
 		if(isAdmin) {
-			const 	addedCategory = await req.app.get('blogAdminModel').addCategory(req.body.newCategory);
+			const 	addedCategory = await req.app.get('blogAdminModel').addCategory(req.body.newOption);
 
 			res.json({addedCategory});
 		} else {
@@ -157,7 +157,7 @@ router.post('/addPost', async (req, res) => {
 router.post('/addSeries', async (req, res) => {
 	if(req.is('json')) {
 		if(isAdmin) {
-			const 	addSeries = await req.app.get('blogAdminModel').addSeries(req.body.newSeries);
+			const 	addSeries = await req.app.get('blogAdminModel').addSeries(req.body.newOption);
 
 			res.json({addSeries});
 		} else {
