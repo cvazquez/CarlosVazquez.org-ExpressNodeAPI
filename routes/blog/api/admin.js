@@ -11,7 +11,7 @@ router.all('*', (req, res, next) => {
 	blogAdminModel	= req.app.get('blogAdminModel');
 	isAdmin			= req.app.get('adminIPs').indexOf(ip) > -1 ? true: false;
 	next();
-})
+});
 
 router.get('/deactivatePostById/:id', async (req, res) => {
 
@@ -39,7 +39,10 @@ router.get('/deactivatePostById/:id', async (req, res) => {
 
 router.get('/getCategories', async (req, res) => {
 	const categories		= blogAdminModel.getCategories();
-	res.json( {categories : await categories});
+	res.json( {
+				categories : await categories,
+				isAdmin
+	});
 });
 
 router.get('/getNewPost', async (req, res) => {
