@@ -3,12 +3,14 @@
 const	createError     = require('http-errors'),
 		express         = require('express'),
 		path            = require('path'),
+		bodyParser		= require("body-parser"),
 		cookieParser    = require('cookie-parser'),
 		logger          = require('morgan'),
 		cors 			= require('cors'),
 		whitelist		= require('../config/variables').whitelist,
 		adminIPs		= require('../config/variables').adminIPs,
-		vtiger			= require('../config/variables').vtiger,
+        vtiger			= require('../config/variables').vtiger,
+        eSynergy        = require('../config/variables').eSynergy,
 		corsOptions		= {
 								origin: function (origin, callback) {
 									if (whitelist.indexOf(origin) !== -1 || !origin) {
@@ -26,16 +28,20 @@ const	createError     = require('http-errors'),
 		blogAdminRouter	= require('./routes/blog/api/admin'),
 		blogAdminObject	= require("./models/blog/admin").blogAdmin,
 		blogAdminModel	= new blogAdminObject(blogDS),
-		vTigerApiRouter   = require('./routes/demo/vtiger');
+        vTigerApiRouter   = require('./routes/demo/vtiger'),
+        eSynergyAPIRouter   = require('./routes/eSynergy/index');
+		// { signIn, welcome, refresh } = require("./handlers");
+
+app.disable('etag'); // prevents caching
 
 // Set connected blog datasource to a global reusable connection
 app.set("blogDS", blogDS);
 app.set('blogModel', blogModel);
 app.set('blogAdminModel', blogAdminModel);
 
-
 app.set('adminIPs', adminIPs);
 app.set('vtiger', vtiger);
+app.set('eSynergy', eSynergy);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -46,6 +52,7 @@ app.enable('trust proxy');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors(corsOptions));
@@ -54,7 +61,7 @@ app.use(cors(corsOptions));
 app.use('/blog/api/admin', blogAdminRouter);
 app.use('/blog/api', blogApiRouter);
 app.use('/demo/vtiger', vTigerApiRouter);
-
+app.use('/eSynergy', eSynergyAPIRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -77,5 +84,9 @@ app.use(function(err, req, res, next) {
 
   next();
 });
+
+/* app.post("/signin", signIn);
+app.get("/welcome", welcome);
+app.post("/refresh", refresh); */
 
 module.exports = app;
