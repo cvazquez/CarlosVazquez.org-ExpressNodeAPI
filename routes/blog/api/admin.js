@@ -5,11 +5,12 @@ let blogAdminModel,
 	isAdmin = false;
 
 router.all('*', (req, res, next) => {
-	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	const ip = req.ip;
 
 	// Set blogAdminModel for all requests
 	blogAdminModel	= req.app.get('blogAdminModel');
 	isAdmin			= req.app.get('adminIPs').indexOf(ip) > -1 ? true: false;
+
 	next();
 });
 
